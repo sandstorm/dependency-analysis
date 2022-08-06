@@ -5,8 +5,6 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/sandstorm/dependency-analysis/analyser"
-
 	"github.com/spf13/cobra"
 )
 
@@ -20,11 +18,7 @@ We only consider packages within the given directory. It can be the project
 root directory or a package within the project to "zoom in".
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		sourcePath := "."
-		if len(args) > 0 {
-			sourcePath = args[0]
-		}  
-		analyser.Analyse(sourcePath)
+		cmd.Help()
 	},
 }
 
