@@ -8,15 +8,17 @@
 
 # Developer documentation
 
-## Start from source
-
 * [install Golang](https://golangdocs.com/install-go-mac-os)
+## Start from source
 
 ```sh
 go run github.com/sandstorm/dependency-analysis
 # or
 go run github.com/sandstorm/dependency-analysis helloWorld
+# or
+go test github.com/sandstorm/dependency-analysis/parsing
 ```
+
 
 ## How to add a new command
 
