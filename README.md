@@ -1,5 +1,6 @@
-# Sandstorm Dependency Analysis
+# WIP: Sandstorm Dependency Analysis
 
+* move to github in future
 * analyses and visualizes dependencies between
     * Java
 
