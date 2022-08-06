@@ -1,7 +1,7 @@
 package main
- 
-import helloWorld "github.com/sandstorm/dependency-analysis/helloWorld"
- 
+
+import "github.com/sandstorm/dependency-analysis/cmd"
+
 func main() {
-	helloWorld.PrintHelloWorld()
+	cmd.Execute()
 }
