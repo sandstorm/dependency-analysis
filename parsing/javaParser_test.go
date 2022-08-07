@@ -1,20 +1,60 @@
 package parsing
 
 import (
+    "bytes"
 	"reflect"
 	"testing"
-	"sort"
 )
 
-func AssertEqual(t *testing.T, expected interface{}, actual interface{}) {
-	if actual == expected {
+func AssertEquals(t *testing.T, expected interface{}, actual interface{}) {
+	if reflect.DeepEqual(actual, expected) {
 		return
 	}
-	t.Errorf("Received %v (type %v), expected %v (type %v)", 
-		actual, reflect.TypeOf(actual),
-		expected, reflect.TypeOf(expected))
+	t.Errorf("expected %v (type %v), received %v (type %v)",
+		expected, reflect.TypeOf(expected),
+		actual, reflect.TypeOf(actual))
+
 }
 
+func TestParseJavaPackage(t *testing.T) {
+	testCases := []struct {
+		name        string
+		fileContent string
+		expected    []string
+	}{
+		{
+			name: "simple class without imports",
+			fileContent: `package de.sandstorm.test;
+			
+			public class Main {
+
+			}`,
+			expected: []string{"de", "sandstorm", "test", "Main"},
+		},
+		{
+			name: "simple class with imports",
+			fileContent: `package de.sandstorm.test;
+			
+			import static org.junit.Assert.assertEquals; // some comment
+
+			public class Main {
+
+			}`,
+			expected: []string{"de", "sandstorm", "test", "Main"},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			file := bytes.NewBufferString(testCase.fileContent)
+			AssertEquals(t,
+				testCase.expected,
+				ParseJavaPackage(file),
+			)
+		})
+	}
+}
+
+/*
 func TestParseJavaFile(t *testing.T) {
 	t.Run("mixed imports", func(t *testing.T) {
 		actual := ParseJavaFile(`
@@ -36,9 +76,10 @@ func TestParseJavaFile(t *testing.T) {
 		sort.Strings(lvl2)
 		sort.Strings(lvl3)
 		expected := [][]string{lvl1, lvl2, lvl3}
-		AssertEqual(t, expected, actual)
+		AssertEquals(t, expected, actual)
 	})
 
 
 }
+*/
 
