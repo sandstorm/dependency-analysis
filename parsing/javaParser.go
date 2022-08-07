@@ -1,18 +1,17 @@
 package parsing
 
 import (
-	"fmt"
 	"regexp"
 	"io"
 	"bufio"
 	"strings"
 )
 
-func ParseJavaPackage(file io.Reader) []string {
+func ParseJavaSourceUnit(fileReader io.Reader) []string {
 	packageRegex := regexp.MustCompile(`package\s+([^; ]+)\s*;`)
 	classRegex := regexp.MustCompile(`(?:public|protected|private)\s+(?:static\s+|final\s+)*class\s+([^{ ]+)`)
 	
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(fileReader)
     scanner.Split(bufio.ScanLines)
 	
 	var packagePath []string = nil
@@ -39,14 +38,27 @@ func ParseJavaPackage(file io.Reader) []string {
 }
 
 
-func ParseJavaImports(content string) []string {
+func ParseJavaImports(rootPackage string, segmentLimit int, fileReader io.Reader) ([]string, error) {
+	buffer := new(strings.Builder)
+	_, err := io.Copy(buffer, fileReader)
+	if err != nil {
+		return nil, err
+	}
+	content := buffer.String()
 	importRegex := regexp.MustCompile(`import\s+(?:static\s+)?([^; ]+)\s*;`)
 	matches := importRegex.FindAllStringSubmatch(content, -1)
+	result :=  make([]string, len(matches))
+	var resultCount = 0
 	for _, v := range matches {
 		fullPackage := v[1]
-		fmt.Printf("%s\n", fullPackage)
+		if strings.HasPrefix(fullPackage, rootPackage) {
+			packgageSegments := strings.Split(fullPackage, ".")
+			croppedSegments := packgageSegments[0:segmentLimit]
+			result[resultCount] = strings.Join(croppedSegments, ".")
+			resultCount++
+		}
 	}
-	return []string{}
+	return result[0:resultCount], nil
 }
 
 

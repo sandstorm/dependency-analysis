@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
     "path/filepath"
-    "io/ioutil"
 	"github.com/sandstorm/dependency-analysis/parsing"
 )
+
+
 
 func Analyse(sourcePath string) {
 	err := filepath.Walk(sourcePath, analyzeFile)
@@ -22,13 +23,13 @@ func analyzeFile(path string, info os.FileInfo, err error) error {
         return nil
 	}
 	if !info.IsDir() {
-    	content, err := ioutil.ReadFile(path)
+    	fileReader, err := os.Open(path)
     	if err != nil {
 			return err
     	}
-    	text := string(content)
-		fmt.Println(path)
-		parsing.ParseJavaFile(text)
+		defer fileReader.Close()
+		sourceUnit := parsing.ParseJavaSourceUnit(fileReader)
+		fmt.Printf("%s\n", sourceUnit)
 	}
 	return nil
 }

@@ -16,7 +16,7 @@ func AssertEquals(t *testing.T, expected interface{}, actual interface{}) {
 
 }
 
-func TestParseJavaPackage(t *testing.T) {
+func TestParseJavaSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
@@ -42,44 +42,63 @@ func TestParseJavaPackage(t *testing.T) {
 			}`,
 			expected: []string{"de", "sandstorm", "test", "Main"},
 		},
+		// TODO: test private static final class
+		// TODO: implement and test commented classes
+		// TODO: implement and test comments in general
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
 				testCase.expected,
-				ParseJavaPackage(file),
+				ParseJavaSourceUnit(file),
 			)
 		})
 	}
 }
 
-/*
 func TestParseJavaFile(t *testing.T) {
-	t.Run("mixed imports", func(t *testing.T) {
-		actual := ParseJavaFile(`
-			package de.sandstorm.test;
+	testCases := []struct {
+		name         string
+		rootPackage  string
+		segmentLimit int
+		fileContent  string
+		expected     []string
+	}{
+		{
+			name: "simple class with mixed imports",
+			rootPackage: "de.sandstorm",
+			segmentLimit: 3,
+			fileContent: `
+				package de.sandstorm.test;
 
-			import java.util.List;
-			import        de.sandstorm.greetings.HelloWorld;
-			import        de.sandstorm.http.requests.GetGreetingRequest;
-			import  static  org.junit.Assert.assertEquals; // some comment
+				import java.util.List;
+				import        de.sandstorm.greetings.HelloWorld;
+				import        de.sandstorm.http.requests.GetGreetingRequest;
+				import  static  org.junit.Assert.assertEquals; // some comment
 
-			public class Main {
+				public class Main {
 
-			}
-		`)
-		lvl1 := []string{"java", "de", "org"}
-		lvl2 := []string{"java.util", "de.sandstorm", "org.junit"}
-		lvl3 := []string{"java.util.List", "de.sandstorm.greetings", "de.sandstorm.http", "org.junit.Assert"}
-		sort.Strings(lvl1)
-		sort.Strings(lvl2)
-		sort.Strings(lvl3)
-		expected := [][]string{lvl1, lvl2, lvl3}
-		AssertEquals(t, expected, actual)
-	})
-
-
+				}
+			`,
+			expected: []string{
+				"de.sandstorm.greetings",
+				"de.sandstorm.http",
+			},
+		},
+		// TODO: test with different parameters
+		// TODO: implement and test comments in general
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			file := bytes.NewBufferString(testCase.fileContent)
+			actual, _ := ParseJavaImports(
+				testCase.rootPackage,
+				testCase.segmentLimit,
+				file)
+			AssertEquals(t,
+				testCase.expected,
+				actual)
+		})
+	}
 }
-*/
-
