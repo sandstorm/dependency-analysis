@@ -22,6 +22,8 @@ TODO: works, but looks ugly
 Idea:   for each node in graph count predecessors (corner case for cycles!)
 		then rank=same for all nodes with same number of predecessors
 
+
+TODO: move package docs into doc.go
 */
 package analyser
 
@@ -57,19 +59,37 @@ func Analyse(sourcePath string) {
 	}
 
 	// Step 2
-	dependencyGraph := findDependencies(rootPackage, sourceUnits)
+	dependencyGraph := WeightByNumberOfDescendant(
+		findDependencies(rootPackage, sourceUnits))
+	nodesByWeight, maxWeight := dependencyGraph.GetNodesGroupedByWeight()
 
 	// Step 3
 	fmt.Println("digraph {")
 	fmt.Printf("label = \"%s\"\n", parsing.ParseJavaJoinPathSegments(rootPackage));
-	fmt.Println("labelloc = \"t\";")
-	for caller, _ := range dependencyGraph.edges {
-		fmt.Printf("n_%s [label=\"%s\"]\n", utils.MD5String(caller), caller)
-	}
+	fmt.Printf("labelloc = \"t\";\n\n")
+	fmt.Printf("node [shape = box];\n\n")
 	for caller, callees := range dependencyGraph.edges {
-		for _, callee := range callees.ToArray() {
-			fmt.Printf("n_%s -> n_%s;\n", utils.MD5String(caller), utils.MD5String(callee))
+		calleesArray := callees.ToArray()
+		if len(calleesArray) > 0 {
+			fmt.Printf("n_%s -> {", utils.MD5String(caller))
+			for _, callee := range calleesArray {
+				fmt.Printf(" n_%s", utils.MD5String(callee))
+			}
+			fmt.Println(" }");
 		}
+	}
+	for weight, nodes := range nodesByWeight {
+		var rank = "same"
+		if weight == 0 {
+			rank = "max"
+		} else if weight == maxWeight {
+			rank = "min"
+		}
+		fmt.Printf("{\nrank=%s;\n", rank)
+		for _, node := range nodes {
+			fmt.Printf("n_%s [label=\"%s\"]\n", utils.MD5String(node), node)
+		}
+		fmt.Println("}")
 	}
 	fmt.Println("}")
 }

@@ -9,28 +9,49 @@ import (
 // nodes may contain weights
 type WeightedStringGraph struct {
 	DirectedStringGraph
-	// weights per node
-	weights map[string]int
+	weightsByNode map[string]int
 }
 
 func NewWeightedStringGraph() *WeightedStringGraph {
     result := &WeightedStringGraph{}
     result.edges = make(map[string]*utils.StringSet)
-    result.weights = make(map[string]int)
+    result.weightsByNode = make(map[string]int)
     return result
 }
 
 func (this *WeightedStringGraph) SetWeight(node string, weight int) {
-	this.weights[node] = weight
+	this.weightsByNode[node] = weight
 }
 
 func (this *WeightedStringGraph) GetWeight(node string) int {
-	return this.weights[node]
+	return this.weightsByNode[node]
 }
 
 func (this *WeightedStringGraph) HasWeight(node string) bool {
-	_, hasWeight := this.weights[node]
+	_, hasWeight := this.weightsByNode[node]
 	return hasWeight
+}
+
+func (this *WeightedStringGraph) GetNodesGroupedByWeight() (map[int][]string, int) {
+	nodesByWeights := make(map[int]*utils.StringSet)
+	for _, node := range this.getNodes() {
+		weight := this.GetWeight(node)
+		var nodes, isSet = nodesByWeights[weight]
+		if !isSet {
+			nodes = utils.NewStringSet()
+			nodesByWeights[weight] = nodes
+		}
+		nodes.Add(node)
+	}
+	maxWeight := 0
+	result := make(map[int][]string)
+	for weight, nodes := range nodesByWeights {
+		result[weight] = nodes.ToArray()
+		if weight > maxWeight {
+			maxWeight = weight
+		}
+	}
+	return result, maxWeight
 }
 
 // Creates an new weightes graph with the same structure as the
