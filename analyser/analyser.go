@@ -1,3 +1,28 @@
+/*
+Beside language-specific parsing this package performs the analysis of the source code.
+
+The main goal is to present the user with a nice dependency graph and hint at cycles.
+We should not expect much knowledge about the code to analyze, but provide
+decent default values instead.
+
+The implemented algorithm in a nutshell (first see Glossary in README):
+
+Step 1) Find all source-units
+We collect all source-units and determine the longest shared package prefix.
+
+Step 2) Collect all dependencies
+We collect all dependencies of every source-unit. Dependencies to stuff outside
+the root package is dropped.
+All other dependencies are cropped according to the detail level (default is
+length of root package plus one). We also crop the source-unit.
+Remaining dependencies from a caller to itself are dropped as well.
+
+Step 3) Render graph
+TODO: works, but looks ugly
+Idea:   for each node in graph count predecessors (corner case for cycles!)
+		then rank=same for all nodes with same number of predecessors
+
+*/
 package analyser
 
 import (
@@ -9,19 +34,32 @@ import (
 	"github.com/sandstorm/dependency-analysis/utils"
 )
 
-// base package/namespace of the project, eg [de sandstorm sso]
-var rootPackage []string = nil
-// mapping from file path to content unit identifier
-// eg src/main/java/de/sandstorm/sso/Main.java -> [de sandstorm sso Main]
-var sourceUnits map[string][]string = nil
+// mapping from file path to source-unit
+type sourceUnitByFile = map[string][]string
+// mapping from source-unit to all its imports
+type dependenciesBySourceUnit = map[string]*utils.StringSet
 
 func Analyse(sourcePath string) {
-	sourceUnits = make(map[string][]string)
-	err := filepath.Walk(sourcePath, findSourceUnits)
+	// Step 1)
+	sourceUnits := make(sourceUnitByFile)
+	err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits))
 	if err != nil {
         log.Fatal(err)
     }
-	dependencies := findDependencies()
+	var rootPackage []string = nil
+	for _, sourceUnit := range sourceUnits {
+		if rootPackage == nil {
+			rootPackage = sourceUnit
+		} else {
+			commonPrefixLength := getCommonPrefixLength(rootPackage, sourceUnit)
+			rootPackage = rootPackage[0:commonPrefixLength]
+		}
+	}
+
+	// Step 2
+	dependencies := findDependencies(rootPackage, sourceUnits)
+
+	// Step 3
 	fmt.Println("digraph {")
 	fmt.Printf("label = \"%s\"\n", parsing.ParseJavaJoinPathSegments(rootPackage));
 	fmt.Println("labelloc = \"t\";")
@@ -36,29 +74,25 @@ func Analyse(sourcePath string) {
 	fmt.Println("}")
 }
 
-func findSourceUnits(path string, info os.FileInfo, err error) error {
-    if err != nil {
-        log.Print(err)
-        return nil
-	}
-	if !info.IsDir() {
-    	fileReader, err := os.Open(path)
-    	if err != nil {
-			return err
-    	}
-		defer fileReader.Close()
-		sourceUnit := parsing.ParseJavaSourceUnit(fileReader)
-		if len(sourceUnit) > 0 {
-			if rootPackage == nil {
-				rootPackage = sourceUnit
-			} else {
-				commonPrefixLength := getCommonPrefixLength(rootPackage, sourceUnit)
-				rootPackage = rootPackage[0:commonPrefixLength]
-			}
-			sourceUnits[path] = sourceUnit
+func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
+	return func (path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Print(err)
+			return nil
 		}
+		if !info.IsDir() {
+			fileReader, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer fileReader.Close()
+			sourceUnit := parsing.ParseJavaSourceUnit(fileReader)
+			if len(sourceUnit) > 0 {
+				result[path] = sourceUnit
+			}
+		}
+		return nil
 	}
-	return nil
 }
 
 func getCommonPrefixLength(left []string, right []string) int {
@@ -71,16 +105,8 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func min(left int, right int) int {
-	if left < right {
-		return left
-	} else {
-		return right
-	}
-}
-
-func findDependencies() map[string]*utils.StringSet {
-	dependencies := make(map[string]*utils.StringSet)
+func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) dependenciesBySourceUnit {
+	dependencies := make(dependenciesBySourceUnit)
 	// TODO: make configurable
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + 1
@@ -123,5 +149,13 @@ func arrayStartsWith(value []string, prefix []string) bool {
 		}
 	}
 	return true
+}
+
+func min(left int, right int) int {
+	if left < right {
+		return left
+	} else {
+		return right
+	}
 }
 

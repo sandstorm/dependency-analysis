@@ -35,3 +35,11 @@ cobra-cli add helloWorld
 
 * [Command Line Interface Library: COBRA](https://github.com/spf13/cobra)
 * [Printing the Graph: GraphViz Examples](https://renenyffenegger.ch/notes/tools/Graphviz/examples/index)
+* [GraphViz rank=same: placing node on the same level](https://stackoverflow.com/questions/14879617/layering-in-graphviz-using-dot-language)
+
+# Glossary
+
+* source-unit - smallest source module, eg classes in PHP and Java, prototypes in Fusion
+* package - location of a source-unit in a hierarchy, eg packages ind Java, namespaces in PHP, folders in JavaScript
+* package segment - one step in the package hierarchy, e.g. _de.sandstorm.test_ consists of the three segments _[de sandstorm test]_
+* root package - largest package prefix shared between all source-units
