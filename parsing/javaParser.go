@@ -38,7 +38,7 @@ func ParseJavaSourceUnit(fileReader io.Reader) []string {
 }
 
 
-func ParseJavaImports(rootPackage string, segmentLimit int, fileReader io.Reader) ([]string, error) {
+func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
 	buffer := new(strings.Builder)
 	_, err := io.Copy(buffer, fileReader)
 	if err != nil {
@@ -47,18 +47,14 @@ func ParseJavaImports(rootPackage string, segmentLimit int, fileReader io.Reader
 	content := buffer.String()
 	importRegex := regexp.MustCompile(`import\s+(?:static\s+)?([^; ]+)\s*;`)
 	matches := importRegex.FindAllStringSubmatch(content, -1)
-	result :=  make([]string, len(matches))
-	var resultCount = 0
-	for _, v := range matches {
-		fullPackage := v[1]
-		if strings.HasPrefix(fullPackage, rootPackage) {
-			packgageSegments := strings.Split(fullPackage, ".")
-			croppedSegments := packgageSegments[0:segmentLimit]
-			result[resultCount] = strings.Join(croppedSegments, ".")
-			resultCount++
-		}
+	result :=  make([][]string, len(matches))
+	for i, v := range matches {
+		result[i] = strings.Split(v[1], ".")
 	}
-	return result[0:resultCount], nil
+	return result, nil
 }
 
+func ParseJavaJoinPathSegments(segments []string) string {
+	return strings.Join(segments, ".")
+}
 

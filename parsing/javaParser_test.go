@@ -60,15 +60,11 @@ func TestParseJavaSourceUnit(t *testing.T) {
 func TestParseJavaFile(t *testing.T) {
 	testCases := []struct {
 		name         string
-		rootPackage  string
-		segmentLimit int
 		fileContent  string
-		expected     []string
+		expected     [][]string
 	}{
 		{
 			name: "simple class with mixed imports",
-			rootPackage: "de.sandstorm",
-			segmentLimit: 3,
 			fileContent: `
 				package de.sandstorm.test;
 
@@ -81,9 +77,11 @@ func TestParseJavaFile(t *testing.T) {
 
 				}
 			`,
-			expected: []string{
-				"de.sandstorm.greetings",
-				"de.sandstorm.http",
+			expected: [][]string{
+				[]string{"java", "util", "List" },
+				[]string{"de", "sandstorm", "greetings", "HelloWorld" },
+				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest" },
+				[]string{"org", "junit", "Assert", "assertEquals" },
 			},
 		},
 		// TODO: test with different parameters
@@ -93,8 +91,6 @@ func TestParseJavaFile(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			actual, _ := ParseJavaImports(
-				testCase.rootPackage,
-				testCase.segmentLimit,
 				file)
 			AssertEquals(t,
 				testCase.expected,

@@ -6,9 +6,12 @@
 
 # User documentation
 
+See `dca help`
+
 # Developer documentation
 
 * [install Golang](https://golangdocs.com/install-go-mac-os)
+* `brew instal graphviz`
 ## Start from source
 
 ```sh
@@ -31,3 +34,4 @@ cobra-cli add helloWorld
 ## Documentation of Libraries
 
 * [Command Line Interface Library: COBRA](https://github.com/spf13/cobra)
+* [Printing the Graph: GraphViz Examples](https://renenyffenegger.ch/notes/tools/Graphviz/examples/index)
