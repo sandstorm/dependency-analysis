@@ -57,16 +57,16 @@ func Analyse(sourcePath string) {
 	}
 
 	// Step 2
-	dependencies := findDependencies(rootPackage, sourceUnits)
+	dependencyGraph := findDependencies(rootPackage, sourceUnits)
 
 	// Step 3
 	fmt.Println("digraph {")
 	fmt.Printf("label = \"%s\"\n", parsing.ParseJavaJoinPathSegments(rootPackage));
 	fmt.Println("labelloc = \"t\";")
-	for caller, _ := range dependencies {
+	for caller, _ := range dependencyGraph.edges {
 		fmt.Printf("n_%s [label=\"%s\"]\n", utils.MD5String(caller), caller)
 	}
-	for caller, callees := range dependencies {
+	for caller, callees := range dependencyGraph.edges {
 		for _, callee := range callees.ToArray() {
 			fmt.Printf("n_%s -> n_%s;\n", utils.MD5String(caller), utils.MD5String(callee))
 		}
@@ -105,8 +105,8 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) dependenciesBySourceUnit {
-	dependencies := make(dependenciesBySourceUnit)
+func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) *DirectedStringGraph {
+	dependencyGraph := NewDirectedStringGraph()
 	// TODO: make configurable
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + 1
@@ -120,23 +120,20 @@ func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) depend
 		if err != nil {
 			log.Fatal(err)
     	}
-		sanitizedDependencies := utils.NewStringSet()
-		for _, dependency := range(allDependencies) {
-			if arrayStartsWith(dependency, rootPackage) {
-				sanitizedDependencies.Add(parsing.ParseJavaJoinPathSegments(
-					dependency[prefixLength:min(segmentLimit, len(dependency))]))
-			}
-		}
 		sourceUnitString := parsing.ParseJavaJoinPathSegments(
 			sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
-		sanitizedDependencies.Remove(sourceUnitString)
-		if dependencies[sourceUnitString] != nil {
-			dependencies[sourceUnitString].AddSet(sanitizedDependencies)
-		} else {
-			dependencies[sourceUnitString] = sanitizedDependencies
+		dependencyGraph.AddNode(sourceUnitString)
+		for _, dependency := range(allDependencies) {
+			if arrayStartsWith(dependency, rootPackage) {
+				target := parsing.ParseJavaJoinPathSegments(
+					dependency[prefixLength:min(segmentLimit, len(dependency))])
+				if sourceUnitString != target {
+					dependencyGraph.AddEdge(sourceUnitString, target)
+				}
+			}
 		}
 	}
-	return dependencies
+	return dependencyGraph
 }
 
 func arrayStartsWith(value []string, prefix []string) bool {

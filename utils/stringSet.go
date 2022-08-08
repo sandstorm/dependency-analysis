@@ -20,6 +20,10 @@ func (this *StringSet) AddSet(other *StringSet) {
 	}
 }
 
+func (this *StringSet) Contains(value string) bool {
+    return this.content[value]
+}
+
 func (this *StringSet) Remove(value string) {
     delete(this.content, value)
 }
