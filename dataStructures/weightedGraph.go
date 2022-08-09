@@ -1,8 +1,7 @@
-package analysis
+package dataStructures
 
 import (
 	"sort"
-	"github.com/sandstorm/dependency-analysis/utils"
 )
 
 // directed graph with nodes of type string
@@ -14,7 +13,7 @@ type WeightedStringGraph struct {
 
 func NewWeightedStringGraph() *WeightedStringGraph {
     result := &WeightedStringGraph{}
-    result.edges = make(map[string]*utils.StringSet)
+    result.edges = make(map[string]*StringSet)
     result.weightsByNode = make(map[string]int)
     return result
 }
@@ -33,12 +32,12 @@ func (this *WeightedStringGraph) HasWeight(node string) bool {
 }
 
 func (this *WeightedStringGraph) GetNodesGroupedByWeight() (map[int][]string, int) {
-	nodesByWeights := make(map[int]*utils.StringSet)
-	for _, node := range this.getNodes() {
+	nodesByWeights := make(map[int]*StringSet)
+	for _, node := range this.GetNodes() {
 		weight := this.GetWeight(node)
 		var nodes, isSet = nodesByWeights[weight]
 		if !isSet {
-			nodes = utils.NewStringSet()
+			nodes = NewStringSet()
 			nodesByWeights[weight] = nodes
 		}
 		nodes.Add(node)
@@ -60,7 +59,7 @@ func (this *WeightedStringGraph) GetNodesGroupedByWeight() (map[int][]string, in
 func WeightByNumberOfDescendant(source *DirectedStringGraph) *WeightedStringGraph {
 	result := NewWeightedStringGraph()
 	result.edges = source.edges
-	nodes := result.getNodes()
+	nodes := result.GetNodes()
 	// If the graph contains cycles the result depends on the order of the nodes
 	// during the iteration. The order in the set is not defined.
 	// So we sort the nodes here to have a deterministic (though kind of arbitrary)
@@ -68,7 +67,7 @@ func WeightByNumberOfDescendant(source *DirectedStringGraph) *WeightedStringGrap
 	sort.Strings(nodes)
 	for _, node := range nodes {
 		if !result.HasWeight(node) {
-			result.calculateWeightsByDescendants(node, utils.NewStringSet())
+			result.calculateWeightsByDescendants(node, NewStringSet())
 		}
 	}
 	return result
@@ -76,7 +75,7 @@ func WeightByNumberOfDescendant(source *DirectedStringGraph) *WeightedStringGrap
 
 // Recursively sets the weights of the given node and all its descendants tto the number
 // of reachable distinct nodes.
-func (this *WeightedStringGraph) calculateWeightsByDescendants(node string, visitedNodes *utils.StringSet) int {
+func (this *WeightedStringGraph) calculateWeightsByDescendants(node string, visitedNodes *StringSet) int {
 	if this.HasWeight(node) {
 		return this.GetWeight(node)
 	}

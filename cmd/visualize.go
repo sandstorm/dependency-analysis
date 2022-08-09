@@ -1,10 +1,21 @@
 package cmd
 
 import (
+	"log"
+	"os"
+	"os/exec"
 	"github.com/sandstorm/dependency-analysis/analysis"
+	"github.com/sandstorm/dependency-analysis/rendering"
 
 	"github.com/spf13/cobra"
 )
+
+// variables for CLI flags
+const defaultOutput = "output.svg"
+var output string = ""
+const detaultTargetType = "svg"
+var targetType string = ""
+var openImage = true
 
 // visualizeCmd represents the visualize command
 var visualizeCmd = &cobra.Command{
@@ -31,20 +42,44 @@ File extensions determine the languages. Currently supported are:
 		if len(args) > 0 {
 			sourcePath = args[0]
 		}  
-		analysis.Analyse(sourcePath)
+		graph, err := analysis.Analyse(sourcePath)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		if output == "stdout" {
+			rendering.RenderDotStdout(graph)
+		} else {
+			outputFormat := rendering.GetOutputFormatByFlagValue(targetType)
+			if outputFormat == nil {
+				log.Fatalf("unknown type '%s', for available types see listSupportedOutputTypes", targetType)
+				os.Exit(2)
+			}
+			if output == defaultOutput && targetType != detaultTargetType {
+				// replace .svg with correct file ending
+				output = output[0:len(output) - 3] + outputFormat.FileEnding
+			}
+			dotFilePath := output + ".dot"
+			if err := rendering.RenderDotFile(graph, dotFilePath); err != nil {
+				log.Fatal(err)
+				os.Exit(3)
+			}
+			if err := rendering.GraphVizCmd(dotFilePath, output, outputFormat).Run(); err != nil {
+				log.Fatal(err)
+				os.Exit(4)
+			}
+			if err := exec.Command("open", output).Run(); err != nil {
+				log.Fatal(err)
+				os.Exit(5)
+			}
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(visualizeCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// visualizeCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// visualizeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	visualizeCmd.Flags().StringVarP(&output, "output", "o", defaultOutput, "path to the image file to generate, use 'stdout' to output DOT graph without image rendering")
+	visualizeCmd.Flags().StringVarP(&targetType, "type", "T", detaultTargetType, "type of the image file, for available formats see listSupportedOutputTypes")
+	visualizeCmd.Flags().BoolVarP(&openImage, "show-image", "s", true, "Automatically open the image after rendering")
 }

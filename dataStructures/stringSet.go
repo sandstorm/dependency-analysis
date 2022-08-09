@@ -1,4 +1,4 @@
-package utils
+package dataStructures
 
 type StringSet struct {
     content map[string]bool

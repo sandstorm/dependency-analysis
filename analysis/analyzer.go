@@ -1,25 +1,23 @@
 package analysis
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"github.com/sandstorm/dependency-analysis/parsing"
-	"github.com/sandstorm/dependency-analysis/utils"
+	"github.com/sandstorm/dependency-analysis/dataStructures"
 )
 
 // mapping from file path to source-unit
 type sourceUnitByFile = map[string][]string
 // mapping from source-unit to all its imports
-type dependenciesBySourceUnit = map[string]*utils.StringSet
+type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
-func Analyse(sourcePath string) {
+func Analyse(sourcePath string) (*dataStructures.WeightedStringGraph, error) {
 	// Step 1)
 	sourceUnits := make(sourceUnitByFile)
 	err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits))
 	if err != nil {
-        log.Fatal(err)
+		return nil, err
     }
 	var rootPackage []string = nil
 	for _, sourceUnit := range sourceUnits {
@@ -32,48 +30,21 @@ func Analyse(sourcePath string) {
 	}
 
 	// Step 2
-	unweightedDependencyGraph := findDependencies(rootPackage, sourceUnits)
+	unweightedDependencyGraph, err := findDependencies(rootPackage, sourceUnits)
+	if err != nil {
+		return nil, err
+    }
 
 	// Step 3
-	dependencyGraph := WeightByNumberOfDescendant(unweightedDependencyGraph)
+	dependencyGraph := dataStructures.WeightByNumberOfDescendant(unweightedDependencyGraph)
 
-	// rendering
-	nodesByWeight, maxWeight := dependencyGraph.GetNodesGroupedByWeight()
-	fmt.Println("digraph {")
-	fmt.Printf("label = \"%s\"\n", parsing.ParseJavaJoinPathSegments(rootPackage));
-	fmt.Printf("labelloc = \"t\";\n\n")
-	fmt.Printf("node [shape = box];\n\n")
-	for caller, callees := range dependencyGraph.edges {
-		calleesArray := callees.ToArray()
-		if len(calleesArray) > 0 {
-			fmt.Printf("n_%s -> {", utils.MD5String(caller))
-			for _, callee := range calleesArray {
-				fmt.Printf(" n_%s", utils.MD5String(callee))
-			}
-			fmt.Println(" }");
-		}
-	}
-	for weight, nodes := range nodesByWeight {
-		var rank = "same"
-		if weight == 0 {
-			rank = "max"
-		} else if weight == maxWeight {
-			rank = "min"
-		}
-		fmt.Printf("{\nrank=%s;\n", rank)
-		for _, node := range nodes {
-			fmt.Printf("n_%s [label=\"%s\"]\n", utils.MD5String(node), node)
-		}
-		fmt.Println("}")
-	}
-	fmt.Println("}")
+	return dependencyGraph, nil
 }
 
 func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
 	return func (path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Print(err)
-			return nil
+			return err
 		}
 		if !info.IsDir() {
 			fileReader, err := os.Open(path)
@@ -100,20 +71,20 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) *DirectedStringGraph {
-	dependencyGraph := NewDirectedStringGraph()
+func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) (*dataStructures.DirectedStringGraph, error) {
+	dependencyGraph := dataStructures.NewDirectedStringGraph()
 	// TODO: make configurable
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + 1
 	for path, sourceUnit := range sourceUnits {
     	fileReader, err := os.Open(path)
     	if err != nil {
-			log.Fatal(err)
+			return nil, err
     	}
 		allDependencies, err := parsing.ParseJavaImports(fileReader)
 		fileReader.Close()
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
     	}
 		sourceUnitString := parsing.ParseJavaJoinPathSegments(
 			sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
@@ -128,7 +99,7 @@ func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) *Direc
 			}
 		}
 	}
-	return dependencyGraph
+	return dependencyGraph, nil
 }
 
 func arrayStartsWith(value []string, prefix []string) bool {
@@ -150,4 +121,3 @@ func min(left int, right int) int {
 		return right
 	}
 }
-
