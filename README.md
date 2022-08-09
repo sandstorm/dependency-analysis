@@ -43,3 +43,5 @@ cobra-cli add helloWorld
 * package - location of a source-unit in a hierarchy, eg packages ind Java, namespaces in PHP, folders in JavaScript
 * package segment - one step in the package hierarchy, e.g. _de.sandstorm.test_ consists of the three segments _[de sandstorm test]_
 * root package - largest package prefix shared between all source-units
+* node - box in a graph
+* edge - arrow in a graph

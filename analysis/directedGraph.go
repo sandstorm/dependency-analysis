@@ -1,4 +1,4 @@
-package analyser
+package analysis
 
 import (
 	"github.com/sandstorm/dependency-analysis/utils"

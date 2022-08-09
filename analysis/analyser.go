@@ -1,31 +1,4 @@
-/*
-Beside language-specific parsing this package performs the analysis of the source code.
-
-The main goal is to present the user with a nice dependency graph and hint at cycles.
-We should not expect much knowledge about the code to analyze, but provide
-decent default values instead.
-
-The implemented algorithm in a nutshell (first see Glossary in README):
-
-Step 1) Find all source-units
-We collect all source-units and determine the longest shared package prefix.
-
-Step 2) Collect all dependencies
-We collect all dependencies of every source-unit. Dependencies to stuff outside
-the root package is dropped.
-All other dependencies are cropped according to the detail level (default is
-length of root package plus one). We also crop the source-unit.
-Remaining dependencies from a caller to itself are dropped as well.
-
-Step 3) Render graph
-TODO: works, but looks ugly
-Idea:   for each node in graph count predecessors (corner case for cycles!)
-		then rank=same for all nodes with same number of predecessors
-
-
-TODO: move package docs into doc.go
-*/
-package analyser
+package analysis
 
 import (
 	"fmt"
@@ -59,11 +32,13 @@ func Analyse(sourcePath string) {
 	}
 
 	// Step 2
-	dependencyGraph := WeightByNumberOfDescendant(
-		findDependencies(rootPackage, sourceUnits))
-	nodesByWeight, maxWeight := dependencyGraph.GetNodesGroupedByWeight()
+	unweightedDependencyGraph := findDependencies(rootPackage, sourceUnits)
 
 	// Step 3
+	dependencyGraph := WeightByNumberOfDescendant(unweightedDependencyGraph)
+
+	// rendering
+	nodesByWeight, maxWeight := dependencyGraph.GetNodesGroupedByWeight()
 	fmt.Println("digraph {")
 	fmt.Printf("label = \"%s\"\n", parsing.ParseJavaJoinPathSegments(rootPackage));
 	fmt.Printf("labelloc = \"t\";\n\n")

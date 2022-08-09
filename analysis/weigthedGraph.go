@@ -1,4 +1,4 @@
-package analyser
+package analysis
 
 import (
 	"sort"
