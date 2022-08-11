@@ -52,9 +52,6 @@ func calculateWeightsByDescendants(target *dataStructures.WeightedStringGraph, n
 	return weight
 }
 
-// all edges of a cylce in a mapping from source to destination
-type Cycle map[string]string
-
 // Provides all cyclic paths.
 // 
 // Runs a DFS (depth first search) over all path in the graph capturing
@@ -82,7 +79,7 @@ type Cycle map[string]string
 // * A -> B -> A (considered)
 // * C -> B -> C (considered)
 // * A -> B -> C -> B -> A (ignored)
-func FindCycles(graph *dataStructures.DirectedStringGraph) []Cycle {
+func FindCycles(graph *dataStructures.DirectedStringGraph) []dataStructures.Cycle {
 	nodes := graph.GetNodes()
 	// We want deterministic results but the result
 	// depends on the iteration order of the graph
@@ -95,10 +92,10 @@ func FindCycles(graph *dataStructures.DirectedStringGraph) []Cycle {
 		executeFindCycles(graph, node, currentPath, doneNodes, resultList)
 	}
 
-	result := make([]Cycle, resultList.Len())
+	result := make([]dataStructures.Cycle, resultList.Len())
 	var i = 0
 	for element := resultList.Front(); element != nil; element = element.Next() {
-		if value, ok := element.Value.(Cycle); ok {
+		if value, ok := element.Value.(dataStructures.Cycle); ok {
 			result[i] = value
 			i++
 		} 
@@ -125,7 +122,7 @@ func executeFindCycles(
 	indexOnCurrentPath := currentPath.IndexOf(currentNode)
 	if indexOnCurrentPath >= 0 {
 		// found cycle
-		cycle := make(Cycle)
+		cycle := make(dataStructures.Cycle)
 		for i := indexOnCurrentPath; i < currentPath.Length(); i++ {
 			next := i + 1
 			if next < currentPath.Length() {

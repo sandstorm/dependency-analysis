@@ -48,8 +48,9 @@ File extensions determine the languages. Currently supported are:
 			os.Exit(1)
 		}
 		wGraph := analysis.WeightByNumberOfDescendant(graph)
+		cycles := analysis.FindCycles(graph)
 		if output == "stdout" {
-			rendering.RenderDotStdout(wGraph)
+			rendering.RenderDotStdout(wGraph, cycles)
 		} else {
 			outputFormat := rendering.GetOutputFormatByFlagValue(targetType)
 			if outputFormat == nil {
@@ -61,7 +62,7 @@ File extensions determine the languages. Currently supported are:
 				output = output[0:len(output) - 3] + outputFormat.FileEnding
 			}
 			dotFilePath := output + ".dot"
-			if err := rendering.RenderDotFile(wGraph, dotFilePath); err != nil {
+			if err := rendering.RenderDotFile(wGraph, cycles, dotFilePath); err != nil {
 				log.Fatal(err)
 				os.Exit(3)
 			}

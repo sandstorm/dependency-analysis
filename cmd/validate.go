@@ -10,6 +10,7 @@ import (
 	"os"
 	"sort"
 	"github.com/sandstorm/dependency-analysis/analysis"
+	"github.com/sandstorm/dependency-analysis/dataStructures"
 
 	"github.com/spf13/cobra"
 )
@@ -72,7 +73,7 @@ there cycles exist betwee
 	},
 }
 
-func getSmallestNode(cycle analysis.Cycle) string {
+func getSmallestNode(cycle dataStructures.Cycle) string {
 	nodes := make([]string, len(cycle))
 	var i = 0
 	for _, node := range cycle {
