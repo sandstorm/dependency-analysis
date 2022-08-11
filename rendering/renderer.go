@@ -5,6 +5,8 @@ import (
 	"os"
 	"github.com/sandstorm/dependency-analysis/dataStructures"
 	"github.com/sandstorm/dependency-analysis/utils"
+
+	"github.com/mazznoer/colorgrad"
 )
 
 func RenderDotFile(sourceGraph *dataStructures.WeightedStringGraph, targetPath string) error {
@@ -31,7 +33,6 @@ func RenderDotStdout(sourceGraph *dataStructures.WeightedStringGraph) error {
 type writeFunc func(string) error
 func renderDot(sourceGraph *dataStructures.WeightedStringGraph, write writeFunc) error {
 		// rendering
-		nodesByWeight, maxWeight := sourceGraph.GetNodesGroupedByWeight()
 		if err := write(fmt.Sprintln("digraph {")); err != nil {
 			return err
 		}
@@ -43,6 +44,34 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, write writeFunc)
 		}
 		if err := write(fmt.Sprintf("node [shape = box];\n\n")); err != nil {
 			return err
+		}
+		nodesByWeight, maxWeight := sourceGraph.GetNodesGroupedByWeight()
+		nodeColorScale := colorgrad.Turbo()
+		for weight, nodes := range nodesByWeight {
+			var rank = "same"
+			if weight == 0 {
+				rank = "max"
+			} else if weight == maxWeight {
+				rank = "min"
+			}
+			color := nodeColorScale.At(0.1 + 0.8*(1.0 - float64(weight)/float64(maxWeight))).Hex()
+			if err := write(fmt.Sprintf("{\nrank=%s;\n", rank)); err != nil {
+				return err
+			}
+			for _, node := range nodes {
+				if err := write(fmt.Sprintf(
+					"n_%s [label=\"%s\",color=\"%s\",style=\"filled\",fillcolor=\"%s\"]\n",
+					utils.MD5String(node),
+					node,
+					color,
+					color,
+				)); err != nil {
+					return err
+				}
+			}
+			if err := write(fmt.Sprintln("}")); err != nil {
+				return err
+			}
 		}
 		for caller, callees := range sourceGraph.GetEdges() {
 			if len(callees) > 0 {
@@ -57,25 +86,6 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, write writeFunc)
 				if err := write(fmt.Sprintln(" }")); err != nil {
 					return err
 				}
-			}
-		}
-		for weight, nodes := range nodesByWeight {
-			var rank = "same"
-			if weight == 0 {
-				rank = "max"
-			} else if weight == maxWeight {
-				rank = "min"
-			}
-			if err := write(fmt.Sprintf("{\nrank=%s;\n", rank)); err != nil {
-				return err
-			}
-			for _, node := range nodes {
-				if err := write(fmt.Sprintf("n_%s [label=\"%s\"]\n", utils.MD5String(node), node)); err != nil {
-					return err
-				}
-			}
-			if err := write(fmt.Sprintln("}")); err != nil {
-				return err
 			}
 		}
 		if err := write(fmt.Sprintln("}")); err != nil {

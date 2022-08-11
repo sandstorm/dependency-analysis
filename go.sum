@@ -1,6 +1,12 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
+github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
+github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
+github.com/mazznoer/colorgrad v0.9.0 h1:C3Y0l0oIJhXLcbmIRxgmBSUAus4np1t/gUFt7fHukDA=
+github.com/mazznoer/colorgrad v0.9.0/go.mod h1:WX2R9wt9B47+txJZVVpM9LY+LAGIdi4lTI5wIyreDH4=
+github.com/mazznoer/csscolorparser v0.1.2 h1:/UBHuQg792ePmGFzTQAC9u+XbFr7/HzP/Gj70Phyz2A=
+github.com/mazznoer/csscolorparser v0.1.2/go.mod h1:Aj22+L/rYN/Y6bj3bYqO3N6g1dtdHtGfQ32xZ5PJQic=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/spf13/cobra v1.5.0 h1:X+jTBEBqF0bHN+9cSMgmfuvv2VHJ9ezmFNf9Y/XstYU=
 github.com/spf13/cobra v1.5.0/go.mod h1:dWXEIy2H428czQCjInthrTRUg7yKbok+2Qi/yBIJoUM=

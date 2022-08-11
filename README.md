@@ -36,6 +36,7 @@ cobra-cli add helloWorld
 * [Command Line Interface Library: COBRA](https://github.com/spf13/cobra)
 * [Printing the Graph: GraphViz Examples](https://renenyffenegger.ch/notes/tools/Graphviz/examples/index)
 * [GraphViz rank=same: placing node on the same level](https://stackoverflow.com/questions/14879617/layering-in-graphviz-using-dot-language)
+* [colorgrad: Go (Golang) color scales library for data visualization, charts, games, maps, generative art and others](https://github.com/mazznoer/colorgrad)
 
 # Glossary
 
