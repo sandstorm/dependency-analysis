@@ -12,8 +12,7 @@ type sourceUnitByFile = map[string][]string
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
-func Analyse(sourcePath string) (*dataStructures.WeightedStringGraph, error) {
-	// Step 1)
+func BuildDependencyGraph(sourcePath string) (*dataStructures.DirectedStringGraph, error) {
 	sourceUnits := make(sourceUnitByFile)
 	err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits))
 	if err != nil {
@@ -29,16 +28,7 @@ func Analyse(sourcePath string) (*dataStructures.WeightedStringGraph, error) {
 		}
 	}
 
-	// Step 2
-	unweightedDependencyGraph, err := findDependencies(rootPackage, sourceUnits)
-	if err != nil {
-		return nil, err
-    }
-
-	// Step 3
-	dependencyGraph := dataStructures.WeightByNumberOfDescendant(unweightedDependencyGraph)
-
-	return dependencyGraph, nil
+	return findDependencies(rootPackage, sourceUnits)
 }
 
 func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {

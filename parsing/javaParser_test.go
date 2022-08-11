@@ -43,8 +43,6 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			expected: []string{"de", "sandstorm", "test", "Main"},
 		},
 		// TODO: test private static final class
-		// TODO: implement and test commented classes
-		// TODO: implement and test comments in general
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -85,7 +83,6 @@ func TestParseJavaFile(t *testing.T) {
 			},
 		},
 		// TODO: test with different parameters
-		// TODO: implement and test comments in general
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {

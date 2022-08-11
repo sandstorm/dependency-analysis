@@ -41,14 +41,15 @@ File extensions determine the languages. Currently supported are:
 		sourcePath := "."
 		if len(args) > 0 {
 			sourcePath = args[0]
-		}  
-		graph, err := analysis.Analyse(sourcePath)
+		}
+		graph, err := analysis.BuildDependencyGraph(sourcePath)
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
 		}
+		wGraph := analysis.WeightByNumberOfDescendant(graph)
 		if output == "stdout" {
-			rendering.RenderDotStdout(graph)
+			rendering.RenderDotStdout(wGraph)
 		} else {
 			outputFormat := rendering.GetOutputFormatByFlagValue(targetType)
 			if outputFormat == nil {
@@ -60,7 +61,7 @@ File extensions determine the languages. Currently supported are:
 				output = output[0:len(output) - 3] + outputFormat.FileEnding
 			}
 			dotFilePath := output + ".dot"
-			if err := rendering.RenderDotFile(graph, dotFilePath); err != nil {
+			if err := rendering.RenderDotFile(wGraph, dotFilePath); err != nil {
 				log.Fatal(err)
 				os.Exit(3)
 			}
