@@ -55,7 +55,7 @@ func TestParseJavaSourceUnit(t *testing.T) {
 	}
 }
 
-func TestParseJavaFile(t *testing.T) {
+func TestParseJavaImports(t *testing.T) {
 	testCases := []struct {
 		name         string
 		fileContent  string

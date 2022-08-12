@@ -37,12 +37,15 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStr
 			return err
 		}
 		// global settings
+		/*
+		TODO: generate label form root package
 		if err := write(fmt.Sprintf("label = \"%s\"\n", "TODO: root package")); err != nil {
 			return err
 		}
 		if err := write(fmt.Sprintf("labelloc = \"t\";\n\n")); err != nil {
 			return err
 		}
+		*/
 		if err := write(fmt.Sprintf("node [shape = box];\n\n")); err != nil {
 			return err
 		}

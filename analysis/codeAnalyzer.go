@@ -14,8 +14,10 @@ type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
 func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.DirectedStringGraph, error) {
 	sourceUnits := make(sourceUnitByFile)
-	err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits))
-	if err != nil {
+	if err := filepath.Walk(sourcePath, initializeParsers); err != nil {
+		return nil, err
+    }
+	if err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits)); err != nil {
 		return nil, err
     }
 	var rootPackage []string = nil
@@ -24,11 +26,21 @@ func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.Directe
 			rootPackage = sourceUnit
 		} else {
 			commonPrefixLength := getCommonPrefixLength(rootPackage, sourceUnit)
-			rootPackage = rootPackage[0:commonPrefixLength]
+			rootPackage = rootPackage[:commonPrefixLength]
 		}
 	}
 
 	return findDependencies(rootPackage, sourceUnits, depth)
+}
+
+func initializeParsers(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return parsing.InitializeParsers(path)
+	}
+	return nil
 }
 
 func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
@@ -42,7 +54,7 @@ func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
 				return err
 			}
 			defer fileReader.Close()
-			sourceUnit := parsing.ParseJavaSourceUnit(fileReader)
+			sourceUnit := parsing.ParseSourceUnit(path, fileReader)
 			if len(sourceUnit) > 0 {
 				result[path] = sourceUnit
 			}
@@ -70,20 +82,22 @@ func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile, depth 
     	if err != nil {
 			return nil, err
     	}
-		allDependencies, err := parsing.ParseJavaImports(fileReader)
+		allDependencies, err := parsing.ParseImports(path, fileReader)
 		fileReader.Close()
 		if err != nil {
 			return nil, err
     	}
-		sourceUnitString := parsing.ParseJavaJoinPathSegments(
+		sourceUnitString := parsing.JoinPathSegments(
+			path,
 			sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
 		dependencyGraph.AddNode(sourceUnitString)
 		for _, dependency := range(allDependencies) {
 			if arrayStartsWith(dependency, rootPackage) {
-				target := parsing.ParseJavaJoinPathSegments(
+				dependencyString := parsing.JoinPathSegments(
+					path,
 					dependency[prefixLength:min(segmentLimit, len(dependency))])
-				if sourceUnitString != target {
-					dependencyGraph.AddEdge(sourceUnitString, target)
+				if sourceUnitString != dependencyString {
+					dependencyGraph.AddEdge(sourceUnitString, dependencyString)
 				}
 			}
 		}
