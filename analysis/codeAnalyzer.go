@@ -12,7 +12,7 @@ type sourceUnitByFile = map[string][]string
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
-func BuildDependencyGraph(sourcePath string) (*dataStructures.DirectedStringGraph, error) {
+func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.DirectedStringGraph, error) {
 	sourceUnits := make(sourceUnitByFile)
 	err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits))
 	if err != nil {
@@ -28,7 +28,7 @@ func BuildDependencyGraph(sourcePath string) (*dataStructures.DirectedStringGrap
 		}
 	}
 
-	return findDependencies(rootPackage, sourceUnits)
+	return findDependencies(rootPackage, sourceUnits, depth)
 }
 
 func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
@@ -61,11 +61,10 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile) (*dataStructures.DirectedStringGraph, error) {
+func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile, depth int) (*dataStructures.DirectedStringGraph, error) {
 	dependencyGraph := dataStructures.NewDirectedStringGraph()
-	// TODO: make configurable
 	prefixLength := len(rootPackage)
-	segmentLimit := len(rootPackage) + 1
+	segmentLimit := len(rootPackage) + depth
 	for path, sourceUnit := range sourceUnits {
     	fileReader, err := os.Open(path)
     	if err != nil {

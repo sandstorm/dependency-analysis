@@ -9,11 +9,19 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"github.com/sandstorm/dependency-analysis/analysis"
 	"github.com/sandstorm/dependency-analysis/dataStructures"
 
 	"github.com/spf13/cobra"
 )
+
+// variables for CLI flags
+var validateCmdFlags = struct {
+	depthString string
+} {
+	depthString: "",
+}
 
 // validateCmd represents the validate command
 var validateCmd = &cobra.Command{
@@ -34,8 +42,15 @@ there cycles exist betwee
 		sourcePath := "."
 		if len(args) > 0 {
 			sourcePath = args[0]
-		}  
-		graph, err := analysis.BuildDependencyGraph(sourcePath)
+		}
+		depthString := validateCmdFlags.depthString
+		depth, err := strconv.Atoi(depthString)
+		if err != nil {
+			log.Fatal("failed to parse parameter 'depth'")
+			log.Fatal(err)
+			os.Exit(6)
+		}
+		graph, err := analysis.BuildDependencyGraph(sourcePath, depth)
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
@@ -67,8 +82,8 @@ there cycles exist betwee
 						fmt.Printf("%s ▼\n", prefix)
 					}
 				}
-				os.Exit(len(cycles))
 			}
+			os.Exit(len(cycles))
 		}
 	},
 }
@@ -86,4 +101,6 @@ func getSmallestNode(cycle dataStructures.Cycle) string {
 
 func init() {
 	rootCmd.AddCommand(validateCmd)
+
+	validateCmd.Flags().StringVarP(&validateCmdFlags.depthString, "depth", "d", "1", "number of steps to go further down into the package hierarchy starting at the root package")
 }
