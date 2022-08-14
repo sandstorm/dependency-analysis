@@ -3,7 +3,6 @@ package rendering
 import (
 	"fmt"
 	"github.com/sandstorm/dependency-analysis/dataStructures"
-	"github.com/sandstorm/dependency-analysis/utils"
 	"math"
 	"os"
 
@@ -77,8 +76,8 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStr
 	for _, coloredEdge := range coloredEdges {
 		if err := write(fmt.Sprintf(
 			"n_%s -> n_%s [color=\"%s\",arrowsize=\"%f\"]\n",
-			utils.MD5String(coloredEdge.caller),
-			utils.MD5String(coloredEdge.callee),
+			md5String(coloredEdge.caller),
+			md5String(coloredEdge.callee),
 			coloredEdge.color,
 			math.Min(5, math.Max(1, float64(coloredEdge.colorCount)/10)),
 		)); err != nil {
@@ -89,12 +88,12 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStr
 	// print remaining edges
 	for caller, callees := range sourceGraph.GetEdges() {
 		if len(callees) > 0 {
-			if err := write(fmt.Sprintf("n_%s -> {", utils.MD5String(caller))); err != nil {
+			if err := write(fmt.Sprintf("n_%s -> {", md5String(caller))); err != nil {
 				return err
 			}
 			for _, callee := range callees {
 				if _, isPresent := coloredEdges[edgeToString(caller, callee)]; !isPresent {
-					if err := write(fmt.Sprintf(" n_%s", utils.MD5String(callee))); err != nil {
+					if err := write(fmt.Sprintf(" n_%s", md5String(callee))); err != nil {
 						return err
 					}
 				}
@@ -122,7 +121,7 @@ func renderDot(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStr
 		for _, node := range nodes {
 			if err := write(fmt.Sprintf(
 				"n_%s [label=\"%s\",color=\"%s\",style=\"filled\",fillcolor=\"%s\"]\n",
-				utils.MD5String(node),
+				md5String(node),
 				node,
 				color,
 				color,

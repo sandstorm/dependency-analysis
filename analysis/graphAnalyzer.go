@@ -85,7 +85,7 @@ func FindCycles(graph *dataStructures.DirectedStringGraph) []dataStructures.Cycl
 	// depends on the iteration order of the graph
 	// which is undefined.
 	sort.Strings(nodes)
-	currentPath := dataStructures.NewStringArrayList(len(nodes))
+	currentPath := dataStructures.NewStringStack(len(nodes))
 	doneNodes := dataStructures.NewStringSet()
 	resultList := list.New()
 	for _, node := range nodes {
@@ -107,7 +107,7 @@ func FindCycles(graph *dataStructures.DirectedStringGraph) []dataStructures.Cycl
 func executeFindCycles(
 	graph *dataStructures.DirectedStringGraph,
 	currentNode string,
-	currentPath *dataStructures.StringArrayList,
+	currentPath *dataStructures.StringStack,
 	doneNodes *dataStructures.StringSet,
 	result *list.List) {
 	// already searched ?
