@@ -6,7 +6,7 @@
 
 # User documentation
 
-See `dca help`
+See `sda help`
 
 # Developer documentation
 
@@ -15,13 +15,12 @@ See `dca help`
 ## Start from source
 
 ```sh
-go run github.com/sandstorm/dependency-analysis
+go run .
 # or
-go run github.com/sandstorm/dependency-analysis helloWorld
+go run . helloWorld
 # or
-go test github.com/sandstorm/dependency-analysis/parsing
+go test ./parsing
 ```
-
 
 ## How to add a new command
 
@@ -29,6 +28,24 @@ go test github.com/sandstorm/dependency-analysis/parsing
 # install COBRA CLI (see links to docs below)
 cobra-cli add helloWorld
 # and adjust generated files
+```
+
+## Helpful development commands
+
+```sh
+# auto-format all .go file
+find . -type f -name '*.go' | xargs -Ifile go fmt file
+# or
+go fmt ./analysis
+
+# print docs
+go doc -all ./dataStructures
+# or
+go doc ./dataStructures
+
+# docs in browser
+go install golang.org/x/tools/cmd/godoc@latest
+godoc -http=:8080
 ```
 
 ## Documentation of Libraries
