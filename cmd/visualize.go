@@ -1,31 +1,31 @@
 package cmd
 
 import (
+	"github.com/sandstorm/dependency-analysis/analysis"
+	"github.com/sandstorm/dependency-analysis/rendering"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
-	"github.com/sandstorm/dependency-analysis/analysis"
-	"github.com/sandstorm/dependency-analysis/rendering"
 
 	"github.com/spf13/cobra"
 )
 
 // variables for CLI flags
 var visualizeCmdFlags = struct {
-	defaultOutput string
-	output string
+	defaultOutput     string
+	output            string
 	defaultTargetType string
-	targetType string
-	openImage bool
-	depthString string
-} {
-	defaultOutput: "output.svg",
-	output: "",
+	targetType        string
+	openImage         bool
+	depthString       string
+}{
+	defaultOutput:     "output.svg",
+	output:            "",
 	defaultTargetType: "svg",
-	targetType: "",
-	openImage: true,
-	depthString: "",
+	targetType:        "",
+	openImage:         true,
+	depthString:       "",
 }
 
 // visualizeCmd represents the visualize command
@@ -85,7 +85,7 @@ File extensions determine the languages. Currently supported are:
 			}
 			if output == defaultOutput && targetType != defaultTargetType {
 				// replace .svg with correct file ending
-				output = output[0:len(output) - 3] + outputFormat.FileEnding
+				output = output[0:len(output)-3] + outputFormat.FileEnding
 			}
 			dotFilePath := output + ".dot"
 			if err := rendering.RenderDotFile(wGraph, cycles, dotFilePath); err != nil {

@@ -1,9 +1,9 @@
 package analysis
 
 import (
-	"sort"
 	"container/list"
 	"github.com/sandstorm/dependency-analysis/dataStructures"
+	"sort"
 )
 
 // Creates an new weightes graph with the same structure as the
@@ -53,28 +53,28 @@ func calculateWeightsByDescendants(target *dataStructures.WeightedStringGraph, n
 }
 
 // Provides all cyclic paths.
-// 
+//
 // Runs a DFS (depth first search) over all path in the graph capturing
 // found cycles. All cycles are collected with two exception:
-// 
+//
 // 1) Cycles with only one node
 //
 // We analyze dependencies here and dependencies within one package are ok.
-// 
+//
 // 2) Cycles using the same node several times
 //
 // Cycles leaving the same node more than once are not considered, example:
 // A graph in the shape of an eight contains three cycles, but we are
 // only interested in the two shorter ones.
-//   ┌───────┬────────┐  
-//   │       │        │  
-//   ▼       │        ▼  
+//   ┌───────┬────────┐
+//   │       │        │
+//   ▼       │        ▼
 // ┌───┐   ┌───┐    ┌───┐
 // │ A │   │ B │    │ C │
 // └───┘   └───┘    └───┘
-//   │       ▲        │  
-//   │       │        │  
-//   └───────┴────────┘  
+//   │       ▲        │
+//   │       │        │
+//   └───────┴────────┘
 // Cycles:
 // * A -> B -> A (considered)
 // * C -> B -> C (considered)
@@ -98,8 +98,8 @@ func FindCycles(graph *dataStructures.DirectedStringGraph) []dataStructures.Cycl
 		if value, ok := element.Value.(dataStructures.Cycle); ok {
 			result[i] = value
 			i++
-		} 
-    }
+		}
+	}
 	return result
 }
 
@@ -118,7 +118,7 @@ func executeFindCycles(
 		// This already includes any cycle starting with "currentPath", thus we can stop now.
 		return
 	}
-	// found cycle ? 
+	// found cycle ?
 	indexOnCurrentPath := currentPath.IndexOf(currentNode)
 	if indexOnCurrentPath >= 0 {
 		// found cycle

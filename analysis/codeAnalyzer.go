@@ -1,14 +1,15 @@
 package analysis
 
 import (
+	"github.com/sandstorm/dependency-analysis/dataStructures"
+	"github.com/sandstorm/dependency-analysis/parsing"
 	"os"
 	"path/filepath"
-	"github.com/sandstorm/dependency-analysis/parsing"
-	"github.com/sandstorm/dependency-analysis/dataStructures"
 )
 
 // mapping from file path to source-unit
 type sourceUnitByFile = map[string][]string
+
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
@@ -16,10 +17,10 @@ func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.Directe
 	sourceUnits := make(sourceUnitByFile)
 	if err := filepath.Walk(sourcePath, initializeParsers); err != nil {
 		return nil, err
-    }
+	}
 	if err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits)); err != nil {
 		return nil, err
-    }
+	}
 	var rootPackage []string = nil
 	for _, sourceUnit := range sourceUnits {
 		if rootPackage == nil {
@@ -44,7 +45,7 @@ func initializeParsers(path string, info os.FileInfo, err error) error {
 }
 
 func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
-	return func (path string, info os.FileInfo, err error) error {
+	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -78,20 +79,20 @@ func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile, depth 
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + depth
 	for path, sourceUnit := range sourceUnits {
-    	fileReader, err := os.Open(path)
-    	if err != nil {
+		fileReader, err := os.Open(path)
+		if err != nil {
 			return nil, err
-    	}
+		}
 		allDependencies, err := parsing.ParseImports(path, fileReader)
 		fileReader.Close()
 		if err != nil {
 			return nil, err
-    	}
+		}
 		sourceUnitString := parsing.JoinPathSegments(
 			path,
 			sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
 		dependencyGraph.AddNode(sourceUnitString)
-		for _, dependency := range(allDependencies) {
+		for _, dependency := range allDependencies {
 			if arrayStartsWith(dependency, rootPackage) {
 				dependencyString := parsing.JoinPathSegments(
 					path,
@@ -109,7 +110,7 @@ func arrayStartsWith(value []string, prefix []string) bool {
 	if len(prefix) > len(value) {
 		return false
 	}
-	for i, v := range(prefix) {
+	for i, v := range prefix {
 		if v != value[i] {
 			return false
 		}

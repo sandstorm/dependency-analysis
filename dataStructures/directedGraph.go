@@ -3,13 +3,13 @@ package dataStructures
 // directed graph with nodes of type string
 type DirectedStringGraph struct {
 	// all nodes with their set of children (might be empty)
-    Edges map[string]*StringSet
+	Edges map[string]*StringSet
 }
 
 func NewDirectedStringGraph() *DirectedStringGraph {
-    result := &DirectedStringGraph{}
-    result.Edges = make(map[string]*StringSet)
-    return result
+	result := &DirectedStringGraph{}
+	result.Edges = make(map[string]*StringSet)
+	return result
 }
 
 // Adds a node to the graph unless it already exists

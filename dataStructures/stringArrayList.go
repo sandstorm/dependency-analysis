@@ -3,14 +3,14 @@ package dataStructures
 // array of dynamic size but with fixed capacity
 type StringArrayList struct {
 	content []string
-	length int
+	length  int
 }
 
 func NewStringArrayList(capacity int) *StringArrayList {
 	result := &StringArrayList{}
 	result.content = make([]string, capacity)
 	result.length = 0
-    return result
+	return result
 }
 
 func (this *StringArrayList) Push(element string) {

@@ -10,7 +10,7 @@ import (
 var helloWorldCmd = &cobra.Command{
 	Use:   "helloWorld",
 	Short: "Prints HelloWorld!",
-	Long: `Prints HelloWorld! to stdout and terminates`,
+	Long:  `Prints HelloWorld! to stdout and terminates`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("HelloWorld!")
 	},

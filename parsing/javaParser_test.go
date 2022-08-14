@@ -1,7 +1,7 @@
 package parsing
 
 import (
-    "bytes"
+	"bytes"
 	"reflect"
 	"testing"
 )
@@ -57,9 +57,9 @@ func TestParseJavaSourceUnit(t *testing.T) {
 
 func TestParseJavaImports(t *testing.T) {
 	testCases := []struct {
-		name         string
-		fileContent  string
-		expected     [][]string
+		name        string
+		fileContent string
+		expected    [][]string
 	}{
 		{
 			name: "simple class with mixed imports",
@@ -76,10 +76,10 @@ func TestParseJavaImports(t *testing.T) {
 				}
 			`,
 			expected: [][]string{
-				[]string{"java", "util", "List" },
-				[]string{"de", "sandstorm", "greetings", "HelloWorld" },
-				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest" },
-				[]string{"org", "junit", "Assert", "assertEquals" },
+				[]string{"java", "util", "List"},
+				[]string{"de", "sandstorm", "greetings", "HelloWorld"},
+				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
+				[]string{"org", "junit", "Assert", "assertEquals"},
 			},
 		},
 		// TODO: test with different parameters

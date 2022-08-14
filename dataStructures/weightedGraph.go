@@ -8,10 +8,10 @@ type WeightedStringGraph struct {
 }
 
 func NewWeightedStringGraph() *WeightedStringGraph {
-    result := &WeightedStringGraph{}
-    result.Edges = make(map[string]*StringSet)
-    result.weightsByNode = make(map[string]int)
-    return result
+	result := &WeightedStringGraph{}
+	result.Edges = make(map[string]*StringSet)
+	result.weightsByNode = make(map[string]int)
+	return result
 }
 
 func (this *WeightedStringGraph) SetWeight(node string, weight int) {

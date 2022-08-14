@@ -1,19 +1,19 @@
 package parsing
 
 import (
-	"regexp"
-	"io"
 	"bufio"
+	"io"
+	"regexp"
 	"strings"
 )
 
 func ParseJavaSourceUnit(fileReader io.Reader) []string {
 	packageRegex := regexp.MustCompile(`package\s+([^; ]+)\s*;`)
 	classRegex := regexp.MustCompile(`(?:public|protected|private)\s+(?:static\s+|final\s+)*class\s+([^{ ]+)`)
-	
+
 	scanner := bufio.NewScanner(fileReader)
-    scanner.Split(bufio.ScanLines)
-	
+	scanner.Split(bufio.ScanLines)
+
 	var packagePath []string = nil
 	var class string = ""
 	for scanner.Scan() {
@@ -33,10 +33,9 @@ func ParseJavaSourceUnit(fileReader io.Reader) []string {
 		if packagePath != nil && class != "" {
 			return append(packagePath, class)
 		}
-    }
+	}
 	return []string{}
 }
-
 
 func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
 	buffer := new(strings.Builder)
@@ -47,7 +46,7 @@ func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
 	content := buffer.String()
 	importRegex := regexp.MustCompile(`import\s+(?:static\s+)?([^; ]+)\s*;`)
 	matches := importRegex.FindAllStringSubmatch(content, -1)
-	result :=  make([][]string, len(matches))
+	result := make([][]string, len(matches))
 	for i, v := range matches {
 		result[i] = strings.Split(v[1], ".")
 	}
@@ -57,4 +56,3 @@ func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
 func ParseJavaJoinPathSegments(segments []string) string {
 	return strings.Join(segments, ".")
 }
-

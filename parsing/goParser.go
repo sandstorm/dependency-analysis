@@ -1,16 +1,16 @@
 package parsing
 
 import (
+	"bufio"
+	"io"
 	"os"
 	"regexp"
-	"io"
-	"bufio"
 	"strings"
 )
 
 var golangParser = struct {
 	modulePath []string
-} {
+}{
 	modulePath: make([]string, 0),
 }
 
@@ -20,10 +20,10 @@ func ParseGoMod(filePath string) error {
 		return err
 	}
 	defer fileReader.Close()
-	
+
 	scanner := bufio.NewScanner(fileReader)
-    scanner.Split(bufio.ScanLines)
-	
+	scanner.Split(bufio.ScanLines)
+
 	moduleRegex := regexp.MustCompile(`module\s+([^ ]+)`)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -33,16 +33,16 @@ func ParseGoMod(filePath string) error {
 			golangParser.modulePath = strings.Split(moduleString, "/")
 			return nil
 		}
-    }
+	}
 	return nil
-} 
+}
 
 func ParseGoSourceUnit(fileName string, fileReader io.Reader) []string {
 	packageRegex := regexp.MustCompile(`package\s+([^ ]+)`)
-	
+
 	scanner := bufio.NewScanner(fileReader)
-    scanner.Split(bufio.ScanLines)
-	
+	scanner.Split(bufio.ScanLines)
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		packageMatch := packageRegex.FindStringSubmatch(line)
@@ -51,7 +51,7 @@ func ParseGoSourceUnit(fileName string, fileReader io.Reader) []string {
 			packagePath := strings.Split(packageString, "/")
 			return append(golangParser.modulePath, append(packagePath, fileName)...)
 		}
-    }
+	}
 	return []string{}
 }
 
@@ -63,17 +63,17 @@ func ParseGoImports(fileReader io.Reader) ([][]string, error) {
 	}
 	content := buffer.String()
 	packagePattern := `(?:[^"()]+\s+)?"([^"]+)"`
-	
+
 	singleImportRegex := regexp.MustCompile(`import\s+` + packagePattern)
 	singleImportMatches := singleImportRegex.FindAllStringSubmatch(content, -1)
-	singleImportResults :=  make([][]string, len(singleImportMatches))
+	singleImportResults := make([][]string, len(singleImportMatches))
 	for i, v := range singleImportMatches {
 		singleImportResults[i] = strings.Split(v[1], "/")
 	}
-	
+
 	importGroupRegex := regexp.MustCompile(`import\s+\(([^()]+)\)`)
 	importGroupMatches := importGroupRegex.FindAllStringSubmatch(content, -1)
-	importGroupResults :=  make([][]string, 100 /* hard-coded upper bound of imports in one import (…) we can handle */)
+	importGroupResults := make([][]string, 100 /* hard-coded upper bound of imports in one import (…) we can handle */)
 	packageRegex := regexp.MustCompile(packagePattern)
 	index := 0
 	for _, group := range importGroupMatches {
@@ -89,4 +89,3 @@ func ParseGoImports(fileReader io.Reader) ([][]string, error) {
 func ParseGoJoinPathSegments(segments []string) string {
 	return strings.Join(segments, "/")
 }
-

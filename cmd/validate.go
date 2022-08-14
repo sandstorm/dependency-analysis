@@ -5,13 +5,13 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"log"
 	"fmt"
+	"github.com/sandstorm/dependency-analysis/analysis"
+	"github.com/sandstorm/dependency-analysis/dataStructures"
+	"log"
 	"os"
 	"sort"
 	"strconv"
-	"github.com/sandstorm/dependency-analysis/analysis"
-	"github.com/sandstorm/dependency-analysis/dataStructures"
 
 	"github.com/spf13/cobra"
 )
@@ -19,7 +19,7 @@ import (
 // variables for CLI flags
 var validateCmdFlags = struct {
 	depthString string
-} {
+}{
 	depthString: "",
 }
 
@@ -73,7 +73,7 @@ there cycles exist betwee
 						firstPrefix = " ┌▶ "
 					}
 					fmt.Printf("%s%s\n", firstPrefix, current)
-					
+
 					current = cycle[current]
 					isLastNode := current == head
 					if isLastNode {

@@ -1,14 +1,14 @@
 package parsing
 
 import (
-    "bytes"
+	"bytes"
 	"testing"
 )
 
 // TODO: func TestParseGoMod(t *testing.T)
 
 func TestParseGoSourceUnit(t *testing.T) {
-	modulePath :=  []string {
+	modulePath := []string{
 		"github.com",
 		"sandstom",
 		"dependency-analysis"}
@@ -20,7 +20,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 		expected    []string
 	}{
 		{
-			name: "simple file without imports",
+			name:     "simple file without imports",
 			fileName: "cycle.go",
 			fileContent: `package dataStructures
 
@@ -31,7 +31,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 				"cycle.go"}...),
 		},
 		{
-			name: "simple file with imports and sub-package",
+			name:     "simple file with imports and sub-package",
 			fileName: "codeAnalyzer.go",
 			fileContent: `package analysis/details
 
@@ -46,7 +46,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 			type sourceUnitByFile = map[string][]string
 			…`,
 			expected: append(modulePath, []string{
-				"analysis", 
+				"analysis",
 				"details",
 				"codeAnalyzer.go"}...),
 		},

@@ -1,9 +1,9 @@
 package analysis
 
 import (
+	"github.com/sandstorm/dependency-analysis/dataStructures"
 	"reflect"
 	"testing"
-	"github.com/sandstorm/dependency-analysis/dataStructures"
 )
 
 func AssertEquals(t *testing.T, message string, expected interface{}, actual interface{}) {
@@ -18,13 +18,13 @@ func AssertEquals(t *testing.T, message string, expected interface{}, actual int
 
 func TestWeightByNumberOfDescendant(t *testing.T) {
 	testCases := []struct {
-		name        string
-		graph 		*dataStructures.DirectedStringGraph
-		expected    map[string]int
+		name     string
+		graph    *dataStructures.DirectedStringGraph
+		expected map[string]int
 	}{
 		{
-			name: "empty graph",
-			graph: dataStructures.NewDirectedStringGraph(),
+			name:     "empty graph",
+			graph:    dataStructures.NewDirectedStringGraph(),
 			expected: map[string]int{},
 		},
 		{
@@ -224,7 +224,7 @@ func TestWeightByNumberOfDescendant(t *testing.T) {
 			actualGraph := WeightByNumberOfDescendant(testCase.graph)
 			for node, expected := range testCase.expected {
 				AssertEquals(t,
-					"incorrect weight of node " + node,
+					"incorrect weight of node "+node,
 					expected,
 					actualGraph.GetWeight(node))
 			}
@@ -234,13 +234,13 @@ func TestWeightByNumberOfDescendant(t *testing.T) {
 
 func TestFindCycles(t *testing.T) {
 	testCases := []struct {
-		name        string
-		graph 		*dataStructures.DirectedStringGraph
-		expected	[]Cycle
+		name     string
+		graph    *dataStructures.DirectedStringGraph
+		expected []Cycle
 	}{
 		{
-			name: "empty graph",
-			graph: dataStructures.NewDirectedStringGraph(),
+			name:     "empty graph",
+			graph:    dataStructures.NewDirectedStringGraph(),
 			expected: []Cycle{},
 		},
 		{
@@ -251,7 +251,7 @@ func TestFindCycles(t *testing.T) {
 			`,
 			graph: dataStructures.NewDirectedStringGraph().
 				AddNode("A"),
-				expected: []Cycle{},
+			expected: []Cycle{},
 		},
 		{
 			name: `
@@ -262,7 +262,7 @@ func TestFindCycles(t *testing.T) {
 			graph: dataStructures.NewDirectedStringGraph().
 				AddNode("A").
 				AddNode("B"),
-				expected: []Cycle{},
+			expected: []Cycle{},
 		},
 		{
 			name: `
@@ -272,7 +272,7 @@ func TestFindCycles(t *testing.T) {
 			`,
 			graph: dataStructures.NewDirectedStringGraph().
 				AddEdge("A", "B"),
-				expected: []Cycle{},
+			expected: []Cycle{},
 		},
 		{
 			name: `
@@ -286,7 +286,7 @@ func TestFindCycles(t *testing.T) {
 			graph: dataStructures.NewDirectedStringGraph().
 				AddEdge("A", "B").
 				AddEdge("a", "b"),
-				expected: []Cycle{},
+			expected: []Cycle{},
 		},
 		{
 			name: `
@@ -301,12 +301,12 @@ func TestFindCycles(t *testing.T) {
 			graph: dataStructures.NewDirectedStringGraph().
 				AddEdge("A", "B").
 				AddEdge("B", "A"),
-				expected: []Cycle{
-					map[string]string {
-						"A": "B",
-						"B": "A",
-					},
+			expected: []Cycle{
+				map[string]string{
+					"A": "B",
+					"B": "A",
 				},
+			},
 		},
 		{
 			name: `
@@ -331,11 +331,11 @@ func TestFindCycles(t *testing.T) {
 				AddEdge("a", "b").
 				AddEdge("b", "a"),
 			expected: []Cycle{
-				map[string]string {
+				map[string]string{
 					"A": "B",
 					"B": "A",
 				},
-				map[string]string {
+				map[string]string{
 					"a": "b",
 					"b": "a",
 				},
@@ -369,7 +369,7 @@ func TestFindCycles(t *testing.T) {
 				AddEdge("C", "B").
 				AddEdge("D", "B"),
 			expected: []Cycle{
-				map[string]string {
+				map[string]string{
 					"A": "B",
 					"B": "A",
 				},
@@ -396,11 +396,11 @@ func TestFindCycles(t *testing.T) {
 				AddEdge("C", "B").
 				AddEdge("D", "B"),
 			expected: []Cycle{
-				map[string]string {
+				map[string]string{
 					"A": "B",
 					"B": "A",
 				},
-				map[string]string {
+				map[string]string{
 					"B": "C",
 					"C": "B",
 				},
@@ -424,11 +424,11 @@ func TestFindCycles(t *testing.T) {
 				AddEdge("B", "C").
 				AddEdge("C", "B"),
 			expected: []Cycle{
-				map[string]string {
+				map[string]string{
 					"A": "B",
 					"B": "A",
 				},
-				map[string]string {
+				map[string]string{
 					"B": "C",
 					"C": "B",
 				},
@@ -454,13 +454,13 @@ func TestFindCycles(t *testing.T) {
 				AddEdge("C", "D").
 				AddEdge("C", "E").
 				AddEdge("E", "B"),
-				expected: []Cycle{
-					map[string]string {
-						"B": "C",
-						"C": "E",
-						"E": "B",
-					},
+			expected: []Cycle{
+				map[string]string{
+					"B": "C",
+					"C": "E",
+					"E": "B",
 				},
+			},
 		},
 	}
 	for _, testCase := range testCases {
