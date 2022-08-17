@@ -23,6 +23,8 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 		}
 	case strings.HasSuffix(sourcePath, ".java"):
 		return ParseJavaSourceUnit(fileReader)
+	case strings.HasSuffix(sourcePath, ".php"):
+		return ParsePhpSourceUnit(fileReader)
 	}
 	return []string{}
 }
@@ -33,6 +35,8 @@ func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
 		return ParseGoImports(fileReader)
 	case strings.HasSuffix(sourcePath, ".java"):
 		return ParseJavaImports(fileReader)
+	case strings.HasSuffix(sourcePath, ".php"):
+		return ParsePhpImports(fileReader)
 	}
 	return [][]string{}, nil
 }
