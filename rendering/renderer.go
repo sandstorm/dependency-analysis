@@ -9,21 +9,21 @@ import (
 	"github.com/mazznoer/colorgrad"
 )
 
-func RenderDotFile(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle, targetPath string) error {
+func RenderDotFile(label string, sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle, targetPath string) error {
 	file, err := os.Create(targetPath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	err2 := renderDot(sourceGraph, cycles, func(value string) error {
+	err2 := renderDot(label, sourceGraph, cycles, func(value string) error {
 		_, err := file.WriteString(value)
 		return err
 	})
 	return err2
 }
 
-func RenderDotStdout(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle) error {
-	err := renderDot(sourceGraph, cycles, func(value string) error {
+func RenderDotStdout(label string, sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle) error {
+	err := renderDot(label, sourceGraph, cycles, func(value string) error {
 		fmt.Print(value)
 		return nil
 	})
@@ -32,20 +32,17 @@ func RenderDotStdout(sourceGraph *dataStructures.WeightedStringGraph, cycles []d
 
 type writeFunc func(string) error
 
-func renderDot(sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle, write writeFunc) error {
+func renderDot(label string, sourceGraph *dataStructures.WeightedStringGraph, cycles []dataStructures.Cycle, write writeFunc) error {
 	if err := write(fmt.Sprintln("digraph {")); err != nil {
 		return err
 	}
 	// global settings
-	/*
-		TODO: generate label form root package
-		if err := write(fmt.Sprintf("label = \"%s\"\n", "TODO: root package")); err != nil {
-			return err
-		}
-		if err := write(fmt.Sprintf("labelloc = \"t\";\n\n")); err != nil {
-			return err
-		}
-	*/
+	if err := write(fmt.Sprintf("label = \"%s\"\n", label)); err != nil {
+		return err
+	}
+	if err := write(fmt.Sprintf("labelloc = \"b\";\n\n")); err != nil {
+		return err
+	}
 	if err := write(fmt.Sprintf("node [shape = box];\n\n")); err != nil {
 		return err
 	}
