@@ -19,7 +19,7 @@ var visualizeCmdFlags = struct {
 	targetType        string
 	openImage         bool
 	depthString       string
-	label             string
+	renderingSettings *rendering.RenderingSettings
 }{
 	defaultOutput:     "output.svg",
 	output:            "",
@@ -27,7 +27,7 @@ var visualizeCmdFlags = struct {
 	targetType:        "",
 	openImage:         true,
 	depthString:       "",
-	label:             "",
+	renderingSettings: rendering.NewRenderingSettings(),
 }
 
 // visualizeCmd represents the visualize command
@@ -57,14 +57,8 @@ File extensions determine the languages. Currently supported are:
 		if len(args) > 0 {
 			sourcePath = args[0]
 		}
-		defaultOutput := visualizeCmdFlags.defaultOutput
-		output := visualizeCmdFlags.output
-		defaultTargetType := visualizeCmdFlags.defaultTargetType
-		targetType := visualizeCmdFlags.targetType
-		openImage := visualizeCmdFlags.openImage
 		depthString := visualizeCmdFlags.depthString
 		depth, err := strconv.Atoi(depthString)
-		label := visualizeCmdFlags.label
 		if err != nil {
 			log.Fatal("failed to parse parameter 'depth'")
 			log.Fatal(err)
@@ -78,20 +72,22 @@ File extensions determine the languages. Currently supported are:
 		}
 		wGraph := analysis.WeightByNumberOfDescendant(graph)
 		cycles := analysis.FindCycles(graph)
+		output := visualizeCmdFlags.output
 		if output == "stdout" {
-			rendering.RenderDotStdout(label, wGraph, cycles)
+			rendering.RenderDotStdout(visualizeCmdFlags.renderingSettings, wGraph, cycles)
 		} else {
+			targetType := visualizeCmdFlags.targetType
 			outputFormat := rendering.GetOutputFormatByFlagValue(targetType)
 			if outputFormat == nil {
 				log.Fatalf("unknown type '%s', for available types see listSupportedOutputTypes", targetType)
 				os.Exit(2)
 			}
-			if output == defaultOutput && targetType != defaultTargetType {
+			if output == visualizeCmdFlags.defaultOutput && targetType != visualizeCmdFlags.defaultTargetType {
 				// replace .svg with correct file ending
 				output = output[0:len(output)-3] + outputFormat.FileEnding
 			}
 			dotFilePath := output + ".dot"
-			if err := rendering.RenderDotFile(label, wGraph, cycles, dotFilePath); err != nil {
+			if err := rendering.RenderDotFile(visualizeCmdFlags.renderingSettings, wGraph, cycles, dotFilePath); err != nil {
 				log.Fatal("failed to render graph into a DOT file")
 				log.Fatal(err)
 				os.Exit(3)
@@ -101,7 +97,7 @@ File extensions determine the languages. Currently supported are:
 				log.Fatal(err)
 				os.Exit(4)
 			}
-			if openImage {
+			if visualizeCmdFlags.openImage {
 				if err := exec.Command("open", output).Run(); err != nil {
 					log.Fatal("failed to open image file")
 					log.Fatal(err)
@@ -115,10 +111,11 @@ File extensions determine the languages. Currently supported are:
 func init() {
 	rootCmd.AddCommand(visualizeCmd)
 
+	renderingDefaults := rendering.NewRenderingSettings()
 	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.output, "output", "o", visualizeCmdFlags.defaultOutput, "path to the image file to generate, use 'stdout' to output DOT graph without image rendering")
 	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.targetType, "type", "T", visualizeCmdFlags.defaultTargetType, "type of the image file, for available formats see listSupportedOutputTypes")
 	visualizeCmd.Flags().BoolVarP(&visualizeCmdFlags.openImage, "show-image", "s", true, "automatically open the image after rendering")
 	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.depthString, "depth", "d", "1", "number of steps to go further down into the package hierarchy starting at the root package")
-	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.label, "label", "l", "rendered by github.com/sandstorm/dependency-analysis", "the graph is located at the bottom of the resulting image")
-	// TODO visualizeCmd.Flags().StringVarP(&rootPackage, "root-package", "r", "", "root package of the project")
+	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.renderingSettings.GraphLabel, "graphLabel", "l", renderingDefaults.GraphLabel, "the graph label is located at the bottom center of the resulting image")
+	visualizeCmd.Flags().BoolVarP(&visualizeCmdFlags.renderingSettings.ShowNodeLabels, "show-node-labels", "", renderingDefaults.ShowNodeLabels, "render graph with node labels")
 }
