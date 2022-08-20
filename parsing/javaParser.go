@@ -39,7 +39,3 @@ func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
 	imports := getAllMatches(content, javaParser.importRegex)
 	return splitAll(imports, "."), nil
 }
-
-func ParseJavaJoinPathSegments(segments []string) string {
-	return strings.Join(segments, ".")
-}

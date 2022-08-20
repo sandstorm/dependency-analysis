@@ -60,7 +60,3 @@ func ParseGoImports(fileReader io.Reader) ([][]string, error) {
 	allImports := append(singleImports, importsInGroups[:importsInGroupsIndex]...)
 	return splitAll(allImports, "/"), nil
 }
-
-func ParseGoJoinPathSegments(segments []string) string {
-	return strings.Join(segments, "/")
-}
