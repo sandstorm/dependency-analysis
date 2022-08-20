@@ -72,7 +72,7 @@ sda validate src/
 
 The given source directory is searched for known file types.
 All source units (classes in Java/PHP, files in golang) are parsed to collect all dependencies.
-Source units and dependencies are described using the full name.
+Source units and dependencies are described using the full name including the package.
 The longest package prefix shared between all source units is then used as root package.
 
 ## Example: root package recognition
@@ -90,7 +90,7 @@ The root package is `de.sandstorm.examples.sda` and the top-level packages are:
 Now the dependencies between this top-level packages are analyzed.
 You can look deeper into the package structure by
 * adjusting the source path
-* my setting `--depth` to a value higher `1`
+* by setting `--depth` to a value higher `1`
 
 ## Validate Command
 
@@ -138,7 +138,7 @@ more green ones lower.
 
 The colors are particulary helpful in tangeld graphs of messy dependencies.
 
-Note that I omit the node labels in the following examples
+Note that I omit the node labels in the following examples.
 
 ### Graph with single cycle
 
@@ -150,23 +150,23 @@ Edges on a cycle have warm colors.
 
 In larger graphs with multiple cycles the color of the edges
 helps to follow single cycles.
-Since in the present of cycles layers cease to exist,
+Since in the presence of cycles layers cease to exist,
 the graph becomes tangled.
 The colors of the nodes still indicate on which level the node
-**might** be.
+*might* be.
 
 ![Graph with several cycles](./images/several-cyclic-dependencies.svg)
 
 ## How to debug and break cycles
 
-If you plan to clean up a project and remove cycles I suggest the following
-* start in thick edges to break multiple cycles at once
+If you plan to clean up a project and remove cycles I suggest the following:
+* start on thick edges to break multiple cycles at once
 * increase the `--depth` to get some insights where the cycles come from
 
 ### Cycles disappear with increased depth
 
 Lucky you, there are no cycles between classes.
-Re-ordering a few classes into packages should do the trick.
+Re-ordering a few classes and packages should do the trick.
 
 ### Cycles between classes
 
@@ -188,11 +188,11 @@ References without imports are ignored.
 ### Commented lines
 
 The parsers ignore comments.
-Commented imports are treated as normal imports
+Commented imports are treated as normal imports.
 
 ### Unused imports
 
-Unused imports are treated as normal imports
+Unused imports are treated as normal imports.
 
 # Developer documentation
 

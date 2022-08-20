@@ -39,7 +39,3 @@ func ParsePhpImports(fileReader io.Reader) ([][]string, error) {
 	usages := getAllMatches(content, phpParser.useRegex)
 	return splitAll(usages, "\\"), nil
 }
-
-func ParsePhpJoinPathSegments(segments []string) string {
-	return strings.Join(segments, "\\")
-}
