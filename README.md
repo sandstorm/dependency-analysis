@@ -16,8 +16,12 @@ and validates the cycle-freeness as part of the test pipeline.
 
 ## Installation
 
+You can download [the latest release](https://github.com/sandstorm/dependency-analysis/releases/) or compile the project on your own.
+
 ```shell
-# compile sda
+# download release
+wget -O sda  https://github.com/sandstorm/dependency-analysis/releases/download/v1.0.0/sda.X
+# … or compile sda
 go build -o ~/bin/sda
 
 # install GraphViz (with Homebrew on OSX)
