@@ -21,6 +21,7 @@ You can download [the latest release](https://github.com/sandstorm/dependency-an
 ```shell
 # download release
 wget -O sda  https://github.com/sandstorm/dependency-analysis/releases/download/v1.0.0/sda.X
+chmod +x sda
 # … or compile sda
 go build -o ~/bin/sda
 
