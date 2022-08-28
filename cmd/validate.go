@@ -80,6 +80,8 @@ there cycles exist between
 				}
 			}
 			os.Exit(len(cycles))
+		} else {
+			fmt.Println("No cycles found. Good work :)")
 		}
 	},
 }
