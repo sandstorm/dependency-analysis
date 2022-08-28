@@ -35,6 +35,8 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 		return ParseJavaSourceUnit(fileReader)
 	case strings.HasSuffix(sourcePath, ".php"):
 		return ParsePhpSourceUnit(fileReader)
+	case strings.HasSuffix(sourcePath, ".groovy"):
+		return ParseGroovySourceUnit(fileReader)
 	}
 	return []string{}
 }
@@ -53,6 +55,8 @@ func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
 		return ParseJavaImports(fileReader)
 	case strings.HasSuffix(sourcePath, ".php"):
 		return ParsePhpImports(fileReader)
+	case strings.HasSuffix(sourcePath, ".groovy"):
+		return ParseGroovyImports(fileReader)
 	}
 	return [][]string{}, nil
 }

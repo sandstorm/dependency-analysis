@@ -40,9 +40,10 @@ sda validate src/
 
 ## Supported languages
 
-* golang
+* Golang
+* Groovy
 * Java
-* PHP
+* PHP (when using classes)
 
 # Table of Content
 

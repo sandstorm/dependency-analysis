@@ -46,11 +46,12 @@ Currently we display unused as well as commented imports appear. Please clean up
 
 To zoom into a sub-package you can set the input path accordingly, e.g.
 $ sda visualize src/main/java/de/sandstorm/sso/services
-or manually overwrite the root package, e.g.
-$ sda visualize src/main/java --root-package de.sandstorm.sso.services
 
 File extensions determine the languages. Currently supported are:
+* Golang (*.go)
+* Groovy (*.groovy)
 * Java (*.java)
+* PHP (*.php)
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		sourcePath := "."

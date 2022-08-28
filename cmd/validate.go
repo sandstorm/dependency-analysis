@@ -34,7 +34,7 @@ We do not want cyclic dependencies anywhere within our projects:
 * not between packages
 
 Since this happens easily by accident this command exits with an error when
-there cycles exist betwee
+there cycles exist between
 * the root packages of the project
 * (more coming later)
 	`,
