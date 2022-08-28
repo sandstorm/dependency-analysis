@@ -69,7 +69,8 @@ sda validate src/
     - [Unused imports](#unused-imports)
 - [Developer documentation](#developer-documentation)
   - [Start from source](#start-from-source)
-  - [How to add a new command](#how-to-add-a-new-command)
+  - [Prepare new release](#prepare-new-release)
+  - [Add a new command](#add-a-new-command)
   - [Helpful development commands](#helpful-development-commands)
   - [Documentation of Libraries and Tools](#documentation-of-libraries-and-tools)
 - [Glossary](#glossary)
@@ -215,7 +216,30 @@ go run . --help
 go test ./parsing
 ```
 
-## How to add a new command
+## Prepare new release
+
+```sh
+# tag version
+git tag v1.0.0
+git push origin v1.0.0
+
+# compile binaries
+./buildAll.sh
+ls ./build
+
+# create release in Github
+open https://github.com/sandstorm/dependency-analysis/releases/new
+
+# build Docker image
+docker build -t sandstormmedia/dependency-analysis:latest .
+docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-analysis:v1
+
+# release Docker images
+docker push sandstormmedia/dependency-analysis:latest
+docker push sandstormmedia/dependency-analysis:v1
+```
+
+## Add a new command
 
 ```sh
 # install COBRA CLI (see links to docs below)
