@@ -13,7 +13,7 @@ var javaParser = struct {
 	importRegex  *regexp.Regexp
 }{
 	packageRegex: regexp.MustCompile(`package\s+([^; ]+)\s*;`),
-	classRegex:   regexp.MustCompile(`(?:public|protected|private)\s+(?:static\s+|final\s+)*class\s+([^{ ]+)`),
+	classRegex:   regexp.MustCompile(`(?:public|protected|private)?\s*(?:static\s+|final\s+)*class\s+([^{ ]+)`),
 	importRegex:  regexp.MustCompile(`import\s+(?:static\s+)?([^; ]+)\s*;`),
 }
 

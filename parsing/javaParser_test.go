@@ -21,6 +21,15 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			expected: []string{"de", "sandstorm", "test", "Main"},
 		},
 		{
+			name: "simple class without imports with default visibility",
+			fileContent: `package de.sandstorm.test;
+			
+			class Main {
+
+			}`,
+			expected: []string{"de", "sandstorm", "test", "Main"},
+		},
+		{
 			name: "simple class with imports",
 			fileContent: `package de.sandstorm.test;
 			
