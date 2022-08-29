@@ -219,24 +219,8 @@ go test ./parsing
 ## Prepare new release
 
 ```sh
-# tag version
-git tag v1.0.0
-git push origin v1.0.0
-
-# compile binaries
-./buildAll.sh
-ls ./build
-
-# create release in Github
-open https://github.com/sandstorm/dependency-analysis/releases/new
-
-# build Docker image
-docker build -t sandstormmedia/dependency-analysis:latest .
-docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-analysis:v1
-
-# release Docker images
-docker push sandstormmedia/dependency-analysis:latest
-docker push sandstormmedia/dependency-analysis:v1
+# adjust version as needed
+./release.sh v1.0.0
 ```
 
 ## Add a new command
