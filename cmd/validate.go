@@ -15,8 +15,10 @@ import (
 // variables for CLI flags
 var validateCmdFlags = struct {
 	depthString string
+	maxCycles string
 }{
 	depthString: "",
+	maxCycles: "0",
 }
 
 // validateCmd represents the validate command
@@ -33,18 +35,27 @@ Since this happens easily by accident this command exits with an error when
 there cycles exist between
 * the root packages of the project
 * (more coming later)
+
+The parameter '--max-cycles' is intended as follows:
+* remove cycles step-by-step from legacy projects with the goal to set --max-cycles to zero eventually
+* rare corner-cases where you consider cycles a valid option
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		sourcePath := "."
 		if len(args) > 0 {
 			sourcePath = args[0]
 		}
-		depthString := validateCmdFlags.depthString
-		depth, err := strconv.Atoi(depthString)
+		depth, err := strconv.Atoi(validateCmdFlags.depthString)
 		if err != nil {
 			log.Fatal("failed to parse parameter 'depth'")
 			log.Fatal(err)
 			os.Exit(6)
+		}
+		maxCycles, err := strconv.Atoi(validateCmdFlags.maxCycles)
+		if err != nil {
+			log.Fatal("failed to parse parameter '--max-cycles'")
+			log.Fatal(err)
+			os.Exit(7)
 		}
 		graph, err := analysis.BuildDependencyGraph(sourcePath, depth)
 		if err != nil {
@@ -79,7 +90,11 @@ there cycles exist between
 					}
 				}
 			}
-			os.Exit(len(cycles))
+			if len(cycles) > maxCycles {
+				os.Exit(len(cycles))
+			} else {
+				fmt.Printf("Found %d cycles are below threshold of %d\n", len(cycles), maxCycles)
+			}
 		} else {
 			fmt.Println("No cycles found. Good work :)")
 		}
@@ -101,4 +116,5 @@ func init() {
 	rootCmd.AddCommand(validateCmd)
 
 	validateCmd.Flags().StringVarP(&validateCmdFlags.depthString, "depth", "d", "1", "number of steps to go further down into the package hierarchy starting at the root package")
+	validateCmd.Flags().StringVarP(&validateCmdFlags.maxCycles, "max-cycles", "", "0", "Maximum number of cycles to attribute with exit-code '0'")
 }
