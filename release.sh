@@ -41,5 +41,5 @@ open https://github.com/sandstorm/dependency-analysis/releases/new
 ## TODO
 #
 # release Docker images
-# docker push sandstormmedia/dependency-analysis:latest
-# docker push sandstormmedia/dependency-analysis:v1
+docker push sandstormmedia/dependency-analysis:latest
+docker push sandstormmedia/dependency-analysis:v1

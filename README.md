@@ -38,6 +38,22 @@ sda visualize src/
 sda validate src/
 ```
 
+For your CI pipeline there is an image on [hub.docker.com](https://hub.docker.com/r/sandstormmedia/dependency-analysis).
+
+```shell
+# use this image in your CI pipeline
+docker run --rm sandstormmedia/dependency-analysis sda --help
+
+# note that the image does not (yet) include GraphViz
+# but you can generate the DOT graph and pipe it
+# to your local GraphViz installation
+docker run --rm \
+  -v $(pwd):/src \
+  sandstormmedia/dependency-analysis \
+  sda visualize /src -o stdout \
+| dot -T svg -o output.svg
+```
+
 ## Supported languages
 
 * Golang
@@ -135,7 +151,7 @@ no cycles found, everything is all right
 ## Visualize Command
 
 To get an overview over a legacy project or to debug and break cyclic dependencies
-you can render the depencency graph into an image, such as
+you can render the dependency graph into an image, such as
 
 ![dependencies of top level packages in this project](./images/sda-dependencies.svg)
 
