@@ -11,6 +11,8 @@ VERSION_EXITCODE=$?
 if [ "$VERSION_EXITCODE" == "0" ]; then
     echo "creating release $VERSION_FULL (in short $VERSION_MAJOR)"
     read -p "Then press enter to continue."
+    echo "Did you update the version in the version command?"
+    read -p "Then press enter to continue."
 else
     echo "invalid version format, should look like v1.2.3 and not like '$VERSION_FULL'"
     exit 1
