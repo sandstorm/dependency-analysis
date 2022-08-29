@@ -31,7 +31,7 @@ docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-a
 
 # tag version
 git tag $VERSION_FULL
-git push origin $VERSION_FULL
+echo "Please execute: git push origin $VERSION_FULL"
 
 # create release in Github
 open https://github.com/sandstorm/dependency-analysis/releases/new
