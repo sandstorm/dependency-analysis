@@ -66,6 +66,7 @@ func calculateWeightsByDescendants(target *dataStructures.WeightedStringGraph, n
 // Cycles leaving the same node more than once are not considered, example:
 // A graph in the shape of an eight contains three cycles, but we are
 // only interested in the two shorter ones.
+//
 //   ┌───────┬────────┐
 //   │       │        │
 //   ▼       │        ▼
@@ -75,6 +76,7 @@ func calculateWeightsByDescendants(target *dataStructures.WeightedStringGraph, n
 //   │       ▲        │
 //   │       │        │
 //   └───────┴────────┘
+//
 // Cycles:
 // * A -> B -> A (considered)
 // * C -> B -> C (considered)

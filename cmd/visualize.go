@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -19,7 +18,7 @@ var visualizeCmdFlags = struct {
 	defaultTargetType string
 	targetType        string
 	openImage         bool
-	depthString       string
+	analyzerSettings  *analyzerSettingsFlags
 	renderingSettings *rendering.RenderingSettings
 }{
 	defaultOutput:     "output.svg",
@@ -27,7 +26,7 @@ var visualizeCmdFlags = struct {
 	defaultTargetType: "svg",
 	targetType:        "",
 	openImage:         true,
-	depthString:       "",
+	analyzerSettings:  NewAnalyzerSettingsFlags(),
 	renderingSettings: rendering.NewRenderingSettings(),
 }
 
@@ -59,14 +58,11 @@ File extensions determine the languages. Currently supported are:
 		if len(args) > 0 {
 			sourcePath = args[0]
 		}
-		depthString := visualizeCmdFlags.depthString
-		depth, err := strconv.Atoi(depthString)
+		analyzerSettings, err := visualizeCmdFlags.analyzerSettings.toAnalyzerSettings(sourcePath)
 		if err != nil {
-			log.Fatal("failed to parse parameter 'depth'")
-			log.Fatal(err)
 			os.Exit(6)
 		}
-		graph, err := analysis.BuildDependencyGraph(sourcePath, depth)
+		graph, err := analysis.BuildDependencyGraph(analyzerSettings)
 		if err != nil {
 			log.Fatal("failed to read source files and build dependency graph")
 			log.Fatal(err)
@@ -119,9 +115,9 @@ func init() {
 	if isOSX() {
 		visualizeCmd.Flags().BoolVarP(&visualizeCmdFlags.openImage, "show-image", "s", true, "automatically open the image after rendering")
 	}
-	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.depthString, "depth", "d", "1", "number of steps to go further down into the package hierarchy starting at the root package")
 	visualizeCmd.Flags().StringVarP(&visualizeCmdFlags.renderingSettings.GraphLabel, "graphLabel", "l", renderingDefaults.GraphLabel, "the graph label is located at the bottom center of the resulting image")
 	visualizeCmd.Flags().BoolVarP(&visualizeCmdFlags.renderingSettings.ShowNodeLabels, "show-node-labels", "", renderingDefaults.ShowNodeLabels, "render graph with node labels")
+	addAnalyzerSettingsFlags(visualizeCmd, visualizeCmdFlags.analyzerSettings)
 }
 
 func isOSX() bool {

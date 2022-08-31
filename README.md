@@ -78,13 +78,15 @@ docker run --rm \
   - [How to debug and break cycles](#how-to-debug-and-break-cycles)
     - [Cycles disappear with increased depth](#cycles-disappear-with-increased-depth)
     - [Cycles between classes](#cycles-between-classes)
-  - [Limitations](#limitations)
-    - [Code needs to be neatly formatted](#code-needs-to-be-neatly-formatted)
-    - [Imports only](#imports-only)
-    - [Commented lines](#commented-lines)
-    - [Unused imports](#unused-imports)
-- [Developer documentation](#developer-documentation)
-  - [Start from source](#start-from-source)
+  - [Settings](#settings)
+    - [--depth](#--depth)
+    - [--include](#--include)
+    - [--max-cycles (validate only)](#--max-cycles-validate-only)
+    - [--graphLabel (visualize only)](#--graphlabel-visualize-only)
+    - [--output (visualize only)](#--output-visualize-only)
+    - [--show-image (visualize and OSX only)](#--show-image-visualize-and-osx-only)
+    - [--show-node-labels (visualize only)](#--show-node-labels-visualize-only)
+    - [-T, --type string (visualize only)](#-t---type-string-visualize-only)
   - [Prepare new release](#prepare-new-release)
   - [Add a new command](#add-a-new-command)
   - [Helpful development commands](#helpful-development-commands)
@@ -195,6 +197,110 @@ Re-ordering a few classes and packages should do the trick.
 
 You probably need to split a class or two.
 Often the cycles appear in classes [which perform several tasks](https://refactoring.guru/smells/large-class).
+
+## Settings
+
+### --depth
+Number of steps to go further down into the package hierarchy starting at the root package.
+The root package is detected automatically.
+
+### --include
+
+Regular expression to filter files by their full path before analysis.
+All paths containing a match are analyzed.
+You can use this to exclude auto-generated clients.
+
+```shell
+sda visualize --include 'src/main/java'
+```
+
+### --max-cycles (validate only)
+Maximum number of cycles to attribute with exit-code _0_.
+
+The parameter '--max-cycles' is intended as follows:
+* remove cycles step-by-step from legacy projects with the goal to set --max-cycles to zero eventually
+* rare corner-cases where you consider cycles a valid option
+
+### --graphLabel (visualize only)
+The graph label is located at the bottom center of the resulting image (default "rendered by github.com/sandstorm/dependency-analysis").
+
+### --output (visualize only)
+Path to the image file to generate, use `stdout` to output DOT graph without image rendering.
+
+### --show-image (visualize and OSX only)
+Automatically open the image after rendering.
+Internally `open …` is called.
+On operating systems other then OSX this flag and feature does not exist.
+
+```shell
+sda visualize --show-image=false
+```
+
+### --show-node-labels (visualize only)
+Render graph with node labels.
+I use this flag to generate anonymous graphs for this documentation.
+
+###  -T, --type string (visualize only)
+Type of the image file.
+
+```
+$ sda visualize listSupportedOutputTypes
+bmp       BMP Windows Bitmap
+cgimage   CGImage Apple Core Graphics
+canon     DOT Graphviz Language
+dot       DOT Graphviz Language
+gv        DOT Graphviz Language
+xdot      DOT Graphviz Language
+xdot1.2   DOT Graphviz Language
+xdot1.4   DOT Graphviz Language
+eps       EPS Encapsulated PostScript
+exr       EXR OpenEXR
+fig       FIG Xfig
+gd        GD LibGD
+gd2       GD2 LibGD
+gif       GIF Graphics Interchange Format
+gtk       GTK Formerly GTK+ / GIMP ToolKit
+ico       ICO Windows Icon
+cmap      Image Map: Client-side
+ismap     Image Map: Server-side
+imap      Image Map: Server-side and client-side
+cmapx     Image Map: Server-side and client-side
+imap_np   Image Map: Server-side and client-side
+cmapx_np  Image Map: Server-side and client-side
+jpg       JPEG Joint Photographic Experts Group
+jpeg      JPEG Joint Photographic Experts Group
+jpe       JPEG Joint Photographic Experts Group
+jp2       JPEG 2000
+json      JSON JavaScript Object Notation
+json0     JSON JavaScript Object Notation
+dot_json  JSON JavaScript Object Notation
+xdot_json JSON JavaScript Object Notation
+pdf       PDF Portable Document Format
+pic       PIC Brian Kernighan's Diagram Language
+pct       PICT Apple PICT
+pict      PICT Apple PICT
+plain     Plain Text Simple, line-based language
+plain-ext Plain Text Simple, line-based language
+png       PNG Portable Network Graphics
+pov       POV-Ray Persistence of Vision Raytracer (prototype)
+ps        PS Adobe PostScript
+ps2       PS/PDF Adobe PostScript for Portable Document Format
+psd       PSD Photoshop
+sgi       SGI Silicon Graphics Image
+svg       SVG Scalable Vector Graphics
+svgz      SVG Scalable Vector Graphics
+tga       TGA Truevision TARGA
+tif       TIFF Tag Image File Format
+tiff      TIFF Tag Image File Format
+tk        Tk Tcl/Tk
+vm        VML Vector Markup Language
+vmlz      VML Vector Markup Language
+vrml      VRML Virtual Reality Modeling Language
+wbmp      WBMP Wireless Bitmap
+webp      WebP WebP
+xlib      X11 X11 Window
+x11       X11 X11 Window
+````
 
 ## Limitations
 

@@ -14,11 +14,11 @@ import (
 
 // variables for CLI flags
 var validateCmdFlags = struct {
-	depthString string
-	maxCycles string
+	analyzerSettings *analyzerSettingsFlags
+	maxCycles        string
 }{
-	depthString: "",
-	maxCycles: "0",
+	analyzerSettings: NewAnalyzerSettingsFlags(),
+	maxCycles:        "0",
 }
 
 // validateCmd represents the validate command
@@ -45,10 +45,8 @@ The parameter '--max-cycles' is intended as follows:
 		if len(args) > 0 {
 			sourcePath = args[0]
 		}
-		depth, err := strconv.Atoi(validateCmdFlags.depthString)
+		analyzerSettings, err := validateCmdFlags.analyzerSettings.toAnalyzerSettings(sourcePath)
 		if err != nil {
-			log.Fatal("failed to parse parameter 'depth'")
-			log.Fatal(err)
 			os.Exit(6)
 		}
 		maxCycles, err := strconv.Atoi(validateCmdFlags.maxCycles)
@@ -57,7 +55,7 @@ The parameter '--max-cycles' is intended as follows:
 			log.Fatal(err)
 			os.Exit(7)
 		}
-		graph, err := analysis.BuildDependencyGraph(sourcePath, depth)
+		graph, err := analysis.BuildDependencyGraph(analyzerSettings)
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
@@ -115,6 +113,6 @@ func getSmallestNode(cycle dataStructures.Cycle) string {
 func init() {
 	rootCmd.AddCommand(validateCmd)
 
-	validateCmd.Flags().StringVarP(&validateCmdFlags.depthString, "depth", "d", "1", "number of steps to go further down into the package hierarchy starting at the root package")
 	validateCmd.Flags().StringVarP(&validateCmdFlags.maxCycles, "max-cycles", "", "0", "Maximum number of cycles to attribute with exit-code '0'")
+	addAnalyzerSettingsFlags(validateCmd, validateCmdFlags.analyzerSettings)
 }

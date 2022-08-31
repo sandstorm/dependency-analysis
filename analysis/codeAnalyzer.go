@@ -5,6 +5,7 @@ import (
 	"github.com/sandstorm/dependency-analysis/parsing"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 // mapping from file path to source-unit
@@ -13,12 +14,12 @@ type sourceUnitByFile = map[string][]string
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
-func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.DirectedStringGraph, error) {
+func BuildDependencyGraph(settings *AnalyzerSettings) (*dataStructures.DirectedStringGraph, error) {
 	sourceUnits := make(sourceUnitByFile)
-	if err := filepath.Walk(sourcePath, initializeParsers); err != nil {
+	if err := filepath.Walk(settings.SourcePath, initializeParsers(settings.IncludePattern)); err != nil {
 		return nil, err
 	}
-	if err := filepath.Walk(sourcePath, findSourceUnits(sourceUnits)); err != nil {
+	if err := filepath.Walk(settings.SourcePath, findSourceUnits(settings.IncludePattern, sourceUnits)); err != nil {
 		return nil, err
 	}
 	var rootPackage []string = nil
@@ -31,25 +32,27 @@ func BuildDependencyGraph(sourcePath string, depth int) (*dataStructures.Directe
 		}
 	}
 
-	return findDependencies(rootPackage, sourceUnits, depth)
+	return findDependencies(rootPackage, sourceUnits, settings.Depth)
 }
 
-func initializeParsers(path string, info os.FileInfo, err error) error {
-	if err != nil {
-		return err
-	}
-	if !info.IsDir() {
-		return parsing.InitializeParsers(path)
-	}
-	return nil
-}
-
-func findSourceUnits(result sourceUnitByFile) filepath.WalkFunc {
+func initializeParsers(includePattern *regexp.Regexp) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
+		if !info.IsDir() && includePattern.MatchString(path) {
+			return parsing.InitializeParsers(path)
+		}
+		return nil
+	}
+}
+
+func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitByFile) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && includePattern.MatchString(path) {
 			fileReader, err := os.Open(path)
 			if err != nil {
 				return err
