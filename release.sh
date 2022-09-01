@@ -29,17 +29,16 @@ GOOS=windows GOARCH=amd64 go build -o ./build/sda_win_amd64
 
 # build Docker image
 docker build -t sandstormmedia/dependency-analysis:latest .
-docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-analysis:v1
+docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-analysis:$VERSION_MAJOR
 
 # tag version
 git tag $VERSION_FULL
-echo "Please execute: git push origin $VERSION_FULL"
 
 # create release in Github
 open https://github.com/sandstorm/dependency-analysis/releases/new
 
-## TODO
-#
-# release Docker images
-docker push sandstormmedia/dependency-analysis:latest
-docker push sandstormmedia/dependency-analysis:v1
+# publishing is done manually
+echo "🙃 Done. Please execute:"
+echo "> git push origin $VERSION_FULL"
+echo "> docker push sandstormmedia/dependency-analysis:latest"
+echo "> docker push sandstormmedia/dependency-analysis:$VERSION_MAJOR"
