@@ -72,6 +72,7 @@ docker run --rm \
   - [Validate Command](#validate-command)
     - [Output in project with cycles](#output-in-project-with-cycles)
     - [Output in project without cycles](#output-in-project-without-cycles)
+    - [Gitlab CI integration](#gitlab-ci-integration)
   - [Visualize Command](#visualize-command)
     - [Graph with single cycle](#graph-with-single-cycle)
     - [Graph with several cycles](#graph-with-several-cycles)
@@ -148,6 +149,20 @@ found 2 cycles:
 ```
 $ sda validate
 no cycles found, everything is all right
+```
+
+### Gitlab CI integration
+
+```yaml
+test-code-dependencies:
+  image: sandstormmedia/dependency-analysis:v1
+  stage: test
+  needs: [] # executes earlier
+  dependencies: [] # starts faster
+  script:
+    - sda validate src/main/java --depth 1
+    - sda validate src/main/java --depth 2
+    - sda validate src/main/java --depth 3 --max-cycles 1
 ```
 
 ## Visualize Command
