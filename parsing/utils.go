@@ -66,9 +66,14 @@ func readerToString(reader io.Reader) (string, error) {
 
 // splits each element using the given delimiter
 func splitAll(values []string, delimiter string) [][]string {
-	result := make([][]string, len(values))
-	for i, v := range values {
-		result[i] = strings.Split(v, delimiter)
+	return mapElements(values, func(e string) []string { return strings.Split(e, delimiter) })
+}
+
+// applies f to all elements of in and returns the result
+func mapElements[TIn any, TOut any](in []TIn, f func(TIn) TOut) []TOut {
+	out := make([]TOut, len(in))
+	for i, v := range in {
+		out[i] = f(v)
 	}
-	return result
+	return out
 }

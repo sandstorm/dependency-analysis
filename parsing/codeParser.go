@@ -3,6 +3,7 @@ package parsing
 import (
 	"io"
 	"strings"
+	"path/filepath"
 )
 
 // 1st step during the code analysis, called for each file in the source directory
@@ -37,6 +38,14 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 		return ParsePhpSourceUnit(fileReader)
 	case strings.HasSuffix(sourcePath, ".groovy"):
 		return ParseGroovySourceUnit(fileReader)
+	case strings.HasSuffix(sourcePath, ".ts"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".tsx"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".js"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".jsx"):
+		return ParseJavaScriptSourceUnit(sourcePath)
 	}
 	return []string{}
 }
@@ -57,6 +66,14 @@ func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
 		return ParsePhpImports(fileReader)
 	case strings.HasSuffix(sourcePath, ".groovy"):
 		return ParseGroovyImports(fileReader)
+	case strings.HasSuffix(sourcePath, ".ts"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".tsx"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".js"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".jsx"):
+		return ParseJavaScriptImports(sourcePath, fileReader)
 	}
 	return [][]string{}, nil
 }
@@ -71,6 +88,18 @@ func JoinPathSegments(sourcePath string, segments []string) string {
 		return strings.Join(segments, ".")
 	case strings.HasSuffix(sourcePath, ".php"):
 		return strings.Join(segments, "\\")
+	case strings.HasSuffix(sourcePath, ".ts"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".tsx"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".js"):
+		fallthrough
+	case strings.HasSuffix(sourcePath, ".jsx"):
+		if len(segments) == 0 {
+			return "index" + filepath.Ext(sourcePath)
+		} else {
+			return strings.Join(segments, "/")
+		}
 	default:
 		return strings.Join(segments, ".")
 	}
