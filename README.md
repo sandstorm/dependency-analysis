@@ -60,6 +60,8 @@ docker run --rm \
 * Groovy
 * Java
 * PHP (when using classes)
+* JavaScript (when using modules)
+* TypeScript (when using modules)
 
 # Table of Content
 

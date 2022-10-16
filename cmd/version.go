@@ -18,7 +18,7 @@ We use Semantic Versioning (see semver.org). In a nutshell this means
 * third digit changed -> nothing new but less bugs
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("1.2.0")
+		fmt.Println("1.3.0")
 	},
 }
 

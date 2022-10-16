@@ -29,6 +29,8 @@ sda validate src/
 * Groovy
 * Java
 * PHP (when using classes)
+* JavaScript (when using modules)
+* TypeScript (when using modules)
 
 # User documentation
 
