@@ -1,0 +1,64 @@
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: "sandstorm-dependency-analysis"
+    main: ./main.go
+    binary: sandstorm-dependency-analysis
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - '386'
+      - amd64
+      - arm
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  -
+    name: sandstorm-dependency-analysis
+    tap:
+      owner: sandstorm
+      name: homebrew-tap
+    # Git author used to commit to the repository.
+    commit_author:
+      name: Sandstorm Release Bot
+      email: release-bot@sandstorm.de
+    # Folder inside the repository to put the formula.
+    folder: Formula
+    homepage: "https://github.com/sandstorm/dependency-analysis"
+    description: "Sandstorm Dependency Analysis"
+    # we want to install the dev runner with a different name
+    install: |
+      bin.install "sandstorm-dependency-analysis" => "sda"

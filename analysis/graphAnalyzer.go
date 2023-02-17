@@ -67,15 +67,15 @@ func calculateWeightsByDescendants(target *dataStructures.WeightedStringGraph, n
 // A graph in the shape of an eight contains three cycles, but we are
 // only interested in the two shorter ones.
 //
-//   ┌───────┬────────┐
-//   │       │        │
-//   ▼       │        ▼
-// ┌───┐   ┌───┐    ┌───┐
-// │ A │   │ B │    │ C │
-// └───┘   └───┘    └───┘
-//   │       ▲        │
-//   │       │        │
-//   └───────┴────────┘
+//	|   ┌───────┬────────┐
+//	|   │       │        │
+//	|   ▼       │        ▼
+//	| ┌───┐   ┌───┐    ┌───┐
+//	| │ A │   │ B │    │ C │
+//	| └───┘   └───┘    └───┘
+//	|   │       ▲        │
+//	|   │       │        │
+//	|   └───────┴────────┘
 //
 // Cycles:
 // * A -> B -> A (considered)

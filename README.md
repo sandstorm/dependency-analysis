@@ -20,9 +20,12 @@ You can download [the latest release](https://github.com/sandstorm/dependency-an
 
 ```shell
 # download release
-wget -O sda  https://github.com/sandstorm/dependency-analysis/releases/download/v1.0.0/sda.X
-chmod +x sda
-# … or compile sda
+open https://github.com/sandstorm/dependency-analysis/releases/
+
+# … or install via homebrew
+brew install sandstorm/tap/sandstorm-dependency-analysis
+
+# … or compile sda locally
 go build -o ~/bin/sda
 
 # install GraphViz (with Homebrew on OSX)
@@ -90,7 +93,14 @@ docker run --rm \
     - [--show-image (visualize and OSX only)](#--show-image-visualize-and-osx-only)
     - [--show-node-labels (visualize only)](#--show-node-labels-visualize-only)
     - [-T, --type string (visualize only)](#-t---type-string-visualize-only)
-  - [Prepare new release](#prepare-new-release)
+  - [Limitations](#limitations)
+    - [Code needs to be neatly formatted](#code-needs-to-be-neatly-formatted)
+    - [Imports only](#imports-only)
+    - [Commented lines](#commented-lines)
+    - [Unused imports](#unused-imports)
+- [Developer documentation](#developer-documentation)
+  - [Start from source](#start-from-source)
+  - [Release](#release)
   - [Add a new command](#add-a-new-command)
   - [Helpful development commands](#helpful-development-commands)
   - [Documentation of Libraries and Tools](#documentation-of-libraries-and-tools)
@@ -344,22 +354,22 @@ Unused imports are treated as normal imports.
 
 * [install Golang](https://golangdocs.com/install-go-mac-os)
 * `brew install graphviz`
+* [install the Sandstorm `dev` script helper](https://github.com/sandstorm/dev-script-runner)
 
 ## Start from source
 
 ```sh
-go run .
+dev run
 # or
-go run . --help
-# or
-go test ./parsing
+dev run --help
 ```
 
-## Prepare new release
+## Release
 
 ```sh
 # adjust version as needed
-./release.sh v1.0.0
+git tag v1.0.0
+dev release
 ```
 
 ## Add a new command
@@ -373,19 +383,8 @@ cobra-cli add helloWorld
 ## Helpful development commands
 
 ```sh
-# auto-format all .go file
-find . -type f -name '*.go' | xargs -Ifile go fmt file
-# or
-go fmt ./analysis
-
-# print docs
-go doc -all ./dataStructures
-# or
-go doc ./dataStructures
-
-# docs in browser
-go install golang.org/x/tools/cmd/godoc@latest
-godoc -http=:8080
+# see all dev scripts
+dev help
 
 # visualize all Java projects in current folder
 find . -type d | grep -iE 'src/main/java$' | xargs -Isrc bash -c 'export project=$(echo src | cut -d / -f 2); sda visualize src -o $project.svg -l $project'

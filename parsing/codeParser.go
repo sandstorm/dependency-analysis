@@ -2,8 +2,8 @@ package parsing
 
 import (
 	"io"
-	"strings"
 	"path/filepath"
+	"strings"
 )
 
 // 1st step during the code analysis, called for each file in the source directory
