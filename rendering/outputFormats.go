@@ -26,9 +26,9 @@ var SupportedOutputFormats = []OutputFormat{
 		Description: "Windows Bitmap",
 	},
 	{
-		Label:      "CGImage",
-		FileEnding: "cgimage",
-		FlagValue: "cgimage	",
+		Label:       "CGImage",
+		FileEnding:  "cgimage",
+		FlagValue:   "cgimage	",
 		Description: "Apple Core Graphics",
 	},
 	{
