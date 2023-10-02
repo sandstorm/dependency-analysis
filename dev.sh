@@ -42,6 +42,13 @@ function test() {
   go test ./dataStructures
   go test ./parsing
   go test ./rendering
+  self_check
+}
+
+# runs the dependency analysis against this project
+function self_check() {
+  go run . validate .
+  go run . visualize .
 }
 
 # Builds the project locall and creates a release
