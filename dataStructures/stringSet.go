@@ -1,5 +1,9 @@
 package dataStructures
 
+import (
+	"fmt"
+)
+
 type StringSet struct {
 	content map[string]bool
 }
@@ -31,9 +35,17 @@ func (this *StringSet) Remove(value string) {
 func (this *StringSet) ToArray() []string {
 	result := make([]string, len(this.content))
 	var i = 0
-	for key, _ := range this.content {
+	for key := range this.content {
 		result[i] = key
 		i++
 	}
 	return result
+}
+
+func (this *StringSet) String() string {
+	result := "[ "
+	for key := range this.content {
+		result += fmt.Sprintf("%v ", key)
+	}
+	return result + "]"
 }

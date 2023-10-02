@@ -48,7 +48,7 @@ function test() {
 # runs the dependency analysis against this project
 function self_check() {
   go run . validate .
-  go run . visualize .
+  go run . visualize --show-image=false .
 }
 
 # Builds the project locall and creates a release
