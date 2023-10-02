@@ -26,7 +26,7 @@ func TestBuildDependencyGraph(t *testing.T) {
 			AddEdge("analysis", "parsing").
 			AddEdge("analysis", "dataStructures").
 			AddEdge("parsing", "dataStructures").
-			AddEdge("rendering", "dataStructuress")
+			AddEdge("rendering", "dataStructures")
 		AssertEquals(t, "incorrect graph", expected, actual)
 	})
 }

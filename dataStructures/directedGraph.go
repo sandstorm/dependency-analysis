@@ -1,6 +1,9 @@
 package dataStructures
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // directed graph with nodes of type string
 type DirectedStringGraph struct {
@@ -55,8 +58,13 @@ func (this *DirectedStringGraph) GetEdges() map[string][]string {
 
 func (this *DirectedStringGraph) String() string {
 	result := "{ "
-	for source, targets := range this.Edges {
-		result += fmt.Sprintf("%v -> %v ", source, targets)
+	sources := make([]string, 0, len(this.Edges))
+	for source := range this.Edges {
+		sources = append(sources, source)
+	}
+	sort.Strings(sources)
+	for _, source := range sources {
+		result += fmt.Sprintf("%v -> %v ", source, this.Edges[source])
 	}
 	return result + "}"
 }

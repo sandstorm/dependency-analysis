@@ -47,7 +47,7 @@ func TestParsePhpSourceUnit(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[][]string{testCase.expected},
 				ParsePhpSourceUnit(file),
 			)
 		})

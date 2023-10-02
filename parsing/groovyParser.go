@@ -17,18 +17,18 @@ var groovyParser = struct {
 	importRegex:  regexp.MustCompile(`import\s+(?:static\s+)?([^; \n]+)\s*;?`),
 }
 
-func ParseGroovySourceUnit(fileReader io.Reader) []string {
+func ParseGroovySourceUnit(fileReader io.Reader) [][]string {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	packageString := getFirstLineMatchInScanner(scanner, groovyParser.packageRegex)
 	className := getFirstLineMatchInScanner(scanner, groovyParser.classRegex)
 	if packageString != "" && className != "" {
-		return append(strings.Split(packageString, "."), className)
+		return [][]string{append(strings.Split(packageString, "."), className)}
 	}
 	if className != "" {
-		return []string{className}
+		return [][]string{[]string{className}}
 	}
-	return []string{}
+	return [][]string{}
 }
 
 func ParseGroovyImports(fileReader io.Reader) ([][]string, error) {

@@ -41,12 +41,13 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			expected: []string{"de", "sandstorm", "test", "Main"},
 		},
 		// TODO: test private static final class
+		// TODO: interfaces and enums (also other languages)
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[][]string{testCase.expected},
 				ParseJavaSourceUnit(file),
 			)
 		})

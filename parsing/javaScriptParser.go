@@ -13,18 +13,18 @@ var javaScriptParser = struct {
 	importRegex: regexp.MustCompile(`(?:import\s+.*)?from\s+["']([^'"]+)["'];?`),
 }
 
-func ParseJavaScriptSourceUnit(sourcePath string) []string {
+func ParseJavaScriptSourceUnit(sourcePath string) [][]string {
 	if strings.Contains(sourcePath, "node_modules") {
-		return []string{}
+		return [][]string{}
 	} else {
 		parent := filepath.Dir(sourcePath)
 		parentSegments := strings.Split(parent, "/")
 		fileName := filepath.Base(sourcePath)
 		fileBasename := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 		if fileBasename == "index" {
-			return parentSegments
+			return [][]string{parentSegments}
 		} else {
-			return append(parentSegments, fileBasename)
+			return [][]string{append(parentSegments, fileBasename)}
 		}
 	}
 }

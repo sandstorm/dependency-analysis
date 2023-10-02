@@ -1,7 +1,7 @@
 package dataStructures
 
 import (
-	"fmt"
+	"sort"
 )
 
 type StringSet struct {
@@ -44,8 +44,13 @@ func (this *StringSet) ToArray() []string {
 
 func (this *StringSet) String() string {
 	result := "[ "
+	keys := make([]string, 0, len(this.content))
 	for key := range this.content {
-		result += fmt.Sprintf("%v ", key)
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		result += key + " "
 	}
 	return result + "]"
 }

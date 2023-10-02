@@ -17,18 +17,18 @@ var phpParser = struct {
 	useRegex:       regexp.MustCompile(`use\s+([^; ]+)\s*;`),
 }
 
-func ParsePhpSourceUnit(fileReader io.Reader) []string {
+func ParsePhpSourceUnit(fileReader io.Reader) [][]string {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	namespace := getFirstLineMatchInScanner(scanner, phpParser.namespaceRegex)
 	className := getFirstLineMatchInScanner(scanner, phpParser.classRegex)
 	if namespace != "" && className != "" {
-		return append(strings.Split(namespace, "\\"), className)
+		return [][]string{append(strings.Split(namespace, "\\"), className)}
 	}
 	if className != "" {
-		return []string{className}
+		return [][]string{[]string{className}}
 	}
-	return []string{}
+	return [][]string{}
 }
 
 func ParsePhpImports(fileReader io.Reader) ([][]string, error) {

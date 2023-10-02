@@ -24,7 +24,7 @@ func InitializeParsers(filePath string) error {
 // The package path is already split by the language's delimiter,
 // e.g. in Java de.sandstorm.test.helpers.ListHelpers results in
 // [de sandstorm test helpers ListHelpers]
-func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
+func ParseSourceUnit(sourcePath string, fileReader io.Reader) [][]string {
 	switch {
 	case strings.HasSuffix(sourcePath, ".go"):
 		filePathSplit := strings.Split(sourcePath, "/")
@@ -47,7 +47,7 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 	case strings.HasSuffix(sourcePath, ".jsx"):
 		return ParseJavaScriptSourceUnit(sourcePath)
 	}
-	return []string{}
+	return [][]string{}
 }
 
 // 3rd step during code analysis, called for each source unit (see 2nc step)

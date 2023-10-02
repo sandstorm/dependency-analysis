@@ -9,27 +9,27 @@ func TestParseJavaScriptSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name       string
 		sourcePath string
-		expected   []string
+		expected   [][]string
 	}{
 		{
 			name:       "file path without dots",
 			sourcePath: "src/Components/Button/button.js",
-			expected:   []string{"src", "Components", "Button", "button"},
+			expected:   [][]string{[]string{"src", "Components", "Button", "button"}},
 		},
 		{
 			name:       "file path with dots",
 			sourcePath: "a/.././src/a/../b/c/../.././Components/Button/button.js",
-			expected:   []string{"src", "Components", "Button", "button"},
+			expected:   [][]string{[]string{"src", "Components", "Button", "button"}},
 		},
 		{
 			name:       "file path with index.js",
 			sourcePath: "a/.././src/a/../b/c/../.././Components/Button/index.js",
-			expected:   []string{"src", "Components", "Button"},
+			expected:   [][]string{[]string{"src", "Components", "Button"}},
 		},
 		{
 			name:       "ignore node_modules",
 			sourcePath: "node_modules/some/lib.js",
-			expected:   []string{},
+			expected:   [][]string{},
 		},
 	}
 	for _, testCase := range testCases {

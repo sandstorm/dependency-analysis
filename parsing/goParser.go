@@ -31,13 +31,13 @@ func ParseGoMod(filePath string) error {
 	return nil
 }
 
-func ParseGoSourceUnit(fileName string, fileReader io.Reader) []string {
+func ParseGoSourceUnit(fileName string, fileReader io.Reader) [][]string {
 	packageString := getFirstLineMatchInReader(fileReader, golangParser.packageRegex)
 	if packageString != "" {
 		packagePath := strings.Split(packageString, "/")
-		return append(golangParser.modulePath, append(packagePath, fileName)...)
+		return [][]string{append(golangParser.modulePath, append(packagePath, fileName)...)}
 	} else {
-		return []string{}
+		return [][]string{}
 	}
 }
 
