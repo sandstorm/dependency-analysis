@@ -98,14 +98,16 @@ func findDependencies(rootPackage []string, sourceUnitsByFile sourceUnitByFileTy
 			sourceUnitString := parsing.JoinPathSegments(
 				path,
 				sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
-			dependencyGraph.AddNode(sourceUnitString)
-			for _, dependency := range allDependencies {
-				if arrayStartsWith(dependency, rootPackage) {
-					dependencyString := parsing.JoinPathSegments(
-						path,
-						dependency[prefixLength:min(segmentLimit, len(dependency))])
-					if sourceUnitString != dependencyString {
-						dependencyGraph.AddEdge(sourceUnitString, dependencyString)
+			if sourceUnitString != "" {
+				dependencyGraph.AddNode(sourceUnitString)
+				for _, dependency := range allDependencies {
+					if arrayStartsWith(dependency, rootPackage) {
+						dependencyString := parsing.JoinPathSegments(
+							path,
+							dependency[prefixLength:min(segmentLimit, len(dependency))])
+						if sourceUnitString != dependencyString {
+							dependencyGraph.AddEdge(sourceUnitString, dependencyString)
+						}
 					}
 				}
 			}

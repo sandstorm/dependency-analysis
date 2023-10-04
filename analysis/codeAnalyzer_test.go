@@ -12,8 +12,8 @@ import (
 func TestBuildDependencyGraph(t *testing.T) {
 	t.Run("analyze sda", func(t *testing.T) {
 		settings := &AnalyzerSettings{
-			SourcePath: "..",
-			Depth: 1,
+			SourcePath:     "..",
+			Depth:          1,
 			IncludePattern: regexp.MustCompile(".*"),
 		}
 		actual, err := BuildDependencyGraph(settings)

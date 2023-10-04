@@ -42,6 +42,21 @@ func getFirstLineMatchInScanner(scanner *bufio.Scanner, regexp *regexp.Regexp) s
 	return ""
 }
 
+// Finds all matches of the given regexp in the given content and returns
+// the first capturing regex group of each match.
+// Continues reading at the current position of the scanner.
+func getAllFollowingMatches(scanner *bufio.Scanner, regexp *regexp.Regexp) []string {
+	result := make([]string, 0)
+	for scanner.Scan() {
+		line := scanner.Text()
+		match := regexp.FindStringSubmatch(line)
+		if match != nil {
+			result = append(result, match[1])
+		}
+	}
+	return result
+}
+
 // Finds all matches of the given regex in the given content and returns
 // the first capturing regex group of each match.
 func getAllMatches(content string, regexp *regexp.Regexp) []string {

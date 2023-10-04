@@ -46,6 +46,8 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) [][]string {
 		fallthrough
 	case strings.HasSuffix(sourcePath, ".jsx"):
 		return ParseJavaScriptSourceUnit(sourcePath)
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return ParseKotlinSourceUnit(fileReader)
 	}
 	return [][]string{}
 }
@@ -74,6 +76,8 @@ func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
 		fallthrough
 	case strings.HasSuffix(sourcePath, ".jsx"):
 		return ParseJavaScriptImports(sourcePath, fileReader)
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return ParseKotlinImports(fileReader)
 	}
 	return [][]string{}, nil
 }
@@ -100,6 +104,8 @@ func JoinPathSegments(sourcePath string, segments []string) string {
 		} else {
 			return strings.Join(segments, "/")
 		}
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return strings.Join(segments, ".")
 	default:
 		return strings.Join(segments, ".")
 	}

@@ -65,6 +65,7 @@ docker run --rm \
 * PHP (when using classes)
 * JavaScript (when using modules)
 * TypeScript (when using modules)
+* Kotlin
 
 # Table of Content
 
