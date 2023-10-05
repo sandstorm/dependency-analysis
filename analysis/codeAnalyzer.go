@@ -9,21 +9,23 @@ import (
 	"github.com/sandstorm/dependency-analysis/parsing"
 )
 
+type fullyQualifiedType = []string
+
 // mapping from file path to source-unit
-type sourceUnitByFileType = map[string][][]string
+type sourceUnitsByFileType = map[string][]fullyQualifiedType
 
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
 func BuildDependencyGraph(settings *AnalyzerSettings) (*dataStructures.DirectedStringGraph, error) {
-	sourceUnitsByFile := make(sourceUnitByFileType)
+	sourceUnitsByFile := make(sourceUnitsByFileType)
 	if err := filepath.Walk(settings.SourcePath, initializeParsers(settings.IncludePattern)); err != nil {
 		return nil, err
 	}
 	if err := filepath.Walk(settings.SourcePath, findSourceUnits(settings.IncludePattern, sourceUnitsByFile)); err != nil {
 		return nil, err
 	}
-	var rootPackage []string = nil
+	var rootPackage fullyQualifiedType = nil
 	for _, sourceUnits := range sourceUnitsByFile {
 		for _, sourceUnit := range sourceUnits {
 			if rootPackage == nil {
@@ -50,7 +52,7 @@ func initializeParsers(includePattern *regexp.Regexp) filepath.WalkFunc {
 	}
 }
 
-func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitByFileType) filepath.WalkFunc {
+func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitsByFileType) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -70,7 +72,7 @@ func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitByFileType)
 	}
 }
 
-func getCommonPrefixLength(left []string, right []string) int {
+func getCommonPrefixLength(left fullyQualifiedType, right fullyQualifiedType) int {
 	limit := min(len(left), len(right))
 	for i := 0; i < limit; i++ {
 		if left[i] != right[i] {
@@ -80,7 +82,7 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func findDependencies(rootPackage []string, sourceUnitsByFile sourceUnitByFileType, depth int) (*dataStructures.DirectedStringGraph, error) {
+func findDependencies(rootPackage fullyQualifiedType, sourceUnitsByFile sourceUnitsByFileType, depth int) (*dataStructures.DirectedStringGraph, error) {
 	dependencyGraph := dataStructures.NewDirectedStringGraph()
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + depth

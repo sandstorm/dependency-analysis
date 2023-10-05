@@ -18,28 +18,28 @@ var kotlinParser = struct {
 	importRegex:  regexp.MustCompile(`import\s+([^; \n]+)\s*;?`),
 }
 
-func ParseKotlinSourceUnit(fileReader io.Reader) [][]string {
+func ParseKotlinSourceUnit(fileReader io.Reader) []fullyQualifiedType {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	packageString := getFirstLineMatchInScanner(scanner, kotlinParser.packageRegex)
 	unitNames := getAllFollowingMatches(scanner, kotlinParser.classRegex)
-	result := make([][]string, 0, len(unitNames))
+	result := make([]fullyQualifiedType, 0, len(unitNames))
 	for _, unitName := range unitNames {
 		if unitName != "" {
 			if packageString != "" {
 				result = append(result, append(strings.Split(packageString, "."), unitName))
 			} else {
-				result = append(result, []string{unitName})
+				result = append(result, fullyQualifiedType{unitName})
 			}
 		}
 	}
 	if len(result) == 0 && packageString != "" {
-		return [][]string{strings.Split(packageString, ".")}
+		return []fullyQualifiedType{strings.Split(packageString, ".")}
 	}
 	return result
 }
 
-func ParseKotlinImports(fileReader io.Reader) ([][]string, error) {
+func ParseKotlinImports(fileReader io.Reader) ([]fullyQualifiedType, error) {
 	content, err := readerToString(fileReader)
 	if err != nil {
 		return nil, err

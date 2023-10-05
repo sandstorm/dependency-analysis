@@ -7,14 +7,14 @@ import (
 )
 
 var golangParser = struct {
-	modulePath         []string
+	modulePath         fullyQualifiedType
 	moduleRegex        *regexp.Regexp
 	packageRegex       *regexp.Regexp
 	singleImportRegex  *regexp.Regexp
 	importGroupRegex   *regexp.Regexp
 	quotedPackageRegex *regexp.Regexp
 }{
-	modulePath:         make([]string, 0),
+	modulePath:         make(fullyQualifiedType, 0),
 	moduleRegex:        regexp.MustCompile(`module\s+([^ ]+)`),
 	packageRegex:       regexp.MustCompile(`package\s+([^ ]+)`),
 	singleImportRegex:  regexp.MustCompile(`import\s+(?:[^"()]+\s+)?"([^"]+)"`),
@@ -31,24 +31,24 @@ func ParseGoMod(filePath string) error {
 	return nil
 }
 
-func ParseGoSourceUnit(fileName string, fileReader io.Reader) [][]string {
+func ParseGoSourceUnit(fileName string, fileReader io.Reader) []fullyQualifiedType {
 	packageString := getFirstLineMatchInReader(fileReader, golangParser.packageRegex)
 	if packageString != "" {
 		packagePath := strings.Split(packageString, "/")
-		return [][]string{append(golangParser.modulePath, append(packagePath, fileName)...)}
+		return []fullyQualifiedType{append(golangParser.modulePath, append(packagePath, fileName)...)}
 	} else {
-		return [][]string{}
+		return []fullyQualifiedType{}
 	}
 }
 
-func ParseGoImports(fileReader io.Reader) ([][]string, error) {
+func ParseGoImports(fileReader io.Reader) ([]fullyQualifiedType, error) {
 	content, err := readerToString(fileReader)
 	if err != nil {
 		return nil, err
 	}
 	singleImports := getAllMatches(content, golangParser.singleImportRegex)
 	importGroups := getAllMatches(content, golangParser.importGroupRegex)
-	importsInGroups := make([]string, 100 /* hard-coded upper bound of imports in one import (…) we can handle */)
+	importsInGroups := make(fullyQualifiedType, 100 /* hard-coded upper bound of imports in one import (…) we can handle */)
 	importsInGroupsIndex := 0
 	for _, group := range importGroups {
 		packageMatches := golangParser.quotedPackageRegex.FindAllStringSubmatch(group, -1)

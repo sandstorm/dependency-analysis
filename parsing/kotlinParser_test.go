@@ -9,7 +9,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple class without imports",
@@ -20,7 +20,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			fun main(args: Array<String>) {
 				SpringApplication.run(TheApp::class.java, *args)
 			}`,
-			expected: [][]string{{"de", "sandstorm", "test", "TheApp"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test", "TheApp"}},
 		},
 		{
 			name: "simple class without imports with default visibility",
@@ -29,7 +29,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			class Main {
 
 			}`,
-			expected: [][]string{{"de", "sandstorm", "test", "Main"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test", "Main"}},
 		},
 		{
 			name: "simple class with imports",
@@ -48,7 +48,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			fun main(args: Array<String>) {
 				SpringApplication.run(TheApp::class.java, *args)
 			}`,
-			expected: [][]string{{"de", "sandstorm", "test", "TheApp"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test", "TheApp"}},
 		},
 		{
 			name: "simple class with imports with ';'",
@@ -67,7 +67,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			fun main(args: Array<String>) {
 				SpringApplication.run(TheApp::class.java, *args)
 			}`,
-			expected: [][]string{{"de", "sandstorm", "test", "TheApp"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test", "TheApp"}},
 		},
 		{
 			name: "multiple classes and data classes",
@@ -89,7 +89,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 				}
 			} 
 			`,
-			expected: [][]string{
+			expected: []fullyQualifiedType{
                 {"de", "sandstorm", "test", "Person"},
                 {"de", "sandstorm", "test", "Item"},
                 {"de", "sandstorm", "test", "MyService"},
@@ -100,7 +100,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			fileContent: `package de.sandstorm.test;
 			
 				open class Person(val name: String)`,
-			expected: [][]string{
+			expected: []fullyQualifiedType{
 				{"de", "sandstorm", "test", "Person"},
 			},
 		},
@@ -112,7 +112,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 			
 			fun String.trimLines() = this.lines().map { it.trim() }.joinTo(StringBuilder(this.length), "").toString()
 			fun String.urlEncode() = URLEncoder.encode(this, "UTF-8")!!`,
-			expected: [][]string{{"de", "sandstorm", "test"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test"}},
 		},
 		{
 			name: "constants only",
@@ -120,7 +120,7 @@ func TestParseKotlinSourceUnit(t *testing.T) {
 
 			const val ADDON_KEY = "io.exply.jira.plugin"
 			val EJC_INSTANCE_NAME= "app"`,
-			expected: [][]string{{"de", "sandstorm", "test"}},
+			expected: []fullyQualifiedType{{"de", "sandstorm", "test"}},
 		},
 		// TODO: interfaces, enums, const, fun
 		// TODO: class visibilities
@@ -140,7 +140,7 @@ func TestParseKotlinImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple class with mixed imports",
@@ -156,7 +156,7 @@ func TestParseKotlinImports(t *testing.T) {
 
 				}
 			`,
-			expected: [][]string{
+			expected: []fullyQualifiedType{
 				{"java", "util", "List"},
 				{"de", "sandstorm", "greetings", "HelloWorld"},
 				{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},

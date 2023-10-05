@@ -17,21 +17,21 @@ var javaParser = struct {
 	importRegex:  regexp.MustCompile(`import\s+(?:static\s+)?([^; ]+)\s*;`),
 }
 
-func ParseJavaSourceUnit(fileReader io.Reader) [][]string {
+func ParseJavaSourceUnit(fileReader io.Reader) []fullyQualifiedType {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	packageString := getFirstLineMatchInScanner(scanner, javaParser.packageRegex)
 	className := getFirstLineMatchInScanner(scanner, javaParser.classRegex)
 	if packageString != "" && className != "" {
-		return [][]string{append(strings.Split(packageString, "."), className)}
+		return []fullyQualifiedType{append(strings.Split(packageString, "."), className)}
 	}
 	if className != "" {
-		return [][]string{[]string{className}}
+		return []fullyQualifiedType{{className}}
 	}
-	return [][]string{}
+	return []fullyQualifiedType{}
 }
 
-func ParseJavaImports(fileReader io.Reader) ([][]string, error) {
+func ParseJavaImports(fileReader io.Reader) ([]fullyQualifiedType, error) {
 	content, err := readerToString(fileReader)
 	if err != nil {
 		return nil, err

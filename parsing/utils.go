@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+type fullyQualifiedType = []string
+
 // Matches a file line by line and provides the value of the first capturing
 // regex group of the first match in the first matching line.
 func getFirstLineMatchInPath(filePath string, regexp *regexp.Regexp) (string, error) {
