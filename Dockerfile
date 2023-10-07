@@ -6,7 +6,7 @@ WORKDIR /sda
 ADD . .
 RUN go build -o build/sda
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 COPY --from=compile /sda/build/sda /usr/local/bin/sda
 CMD sda validate --help
