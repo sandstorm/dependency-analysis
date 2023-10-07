@@ -61,6 +61,7 @@ function release() {
   _log_yellow " - docker tag sandstormmedia/dependency-analysis:latest sandstormmedia/dependency-analysis:version-goes-here"
   _log_yellow " - docker push sandstormmedia/dependency-analysis:latest"
   _log_yellow " - docker push sandstormmedia/dependency-analysis:the-version"
+  _log_yellow " - adjust release notes: https://github.com/sandstorm/dependency-analysis/releases"
 }
 
 # Docs in the browser at localhost:8080
