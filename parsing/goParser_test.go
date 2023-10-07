@@ -8,7 +8,7 @@ import (
 // TODO: func TestParseGoMod(t *testing.T)
 
 func TestParseGoSourceUnit(t *testing.T) {
-	modulePath := []string{
+	modulePath := fullyQualifiedType{
 		"github.com",
 		"sandstom",
 		"dependency-analysis"}
@@ -17,7 +17,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 		name        string
 		fileName    string
 		fileContent string
-		expected    []string
+		expected    fullyQualifiedType
 	}{
 		{
 			name:     "simple file without imports",
@@ -45,7 +45,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 			// mapping from file path to source-unit
 			type sourceUnitByFile = map[string][]string
 			…`,
-			expected: append(modulePath, []string{
+			expected: append(modulePath, fullyQualifiedType{
 				"analysis",
 				"details",
 				"codeAnalyzer.go"}...),
@@ -55,7 +55,7 @@ func TestParseGoSourceUnit(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[]fullyQualifiedType{testCase.expected},
 				ParseGoSourceUnit(testCase.fileName, file),
 			)
 		})
@@ -66,7 +66,7 @@ func TestParseGoImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple file without imports",
@@ -74,7 +74,7 @@ func TestParseGoImports(t *testing.T) {
 
 			// all edges of a cylce in a mapping from source to destination
 			type Cycle map[string]string`,
-			expected: [][]string{},
+			expected: []fullyQualifiedType{},
 		},
 		{
 			name: "simple file with single imports",
@@ -85,8 +85,8 @@ func TestParseGoImports(t *testing.T) {
 			// mapping from file path to source-unit
 			type sourceUnitByFile = map[string][]string
 			…`,
-			expected: [][]string{
-				[]string{"os"},
+			expected: []fullyQualifiedType{
+				{"os"},
 			},
 		},
 		{
@@ -103,11 +103,11 @@ func TestParseGoImports(t *testing.T) {
 			// mapping from file path to source-unit
 			type sourceUnitByFile = map[string][]string
 			…`,
-			expected: [][]string{
-				[]string{"os"},
-				[]string{"path", "filepath"},
-				[]string{"github.com", "sandstorm", "dependency-analysis", "parsing"},
-				[]string{"github.com", "sandstorm", "dependency-analysis", "dataStructures"},
+			expected: []fullyQualifiedType{
+				{"os"},
+				{"path", "filepath"},
+				{"github.com", "sandstorm", "dependency-analysis", "parsing"},
+				{"github.com", "sandstorm", "dependency-analysis", "dataStructures"},
 			},
 		},
 		{
@@ -122,11 +122,11 @@ func TestParseGoImports(t *testing.T) {
 			// mapping from file path to source-unit
 			type sourceUnitByFile = map[string][]string
 			…`,
-			expected: [][]string{
-				[]string{"os"},
-				[]string{"path", "filepath"},
-				[]string{"github.com", "sandstorm", "dependency-analysis", "parsing"},
-				[]string{"github.com", "sandstorm", "dependency-analysis", "dataStructures"},
+			expected: []fullyQualifiedType{
+				{"os"},
+				{"path", "filepath"},
+				{"github.com", "sandstorm", "dependency-analysis", "parsing"},
+				{"github.com", "sandstorm", "dependency-analysis", "dataStructures"},
 			},
 		},
 	}

@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/sandstorm/dependency-analysis/analysis"
-	"github.com/sandstorm/dependency-analysis/rendering"
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/sandstorm/dependency-analysis/analysis"
+	"github.com/sandstorm/dependency-analysis/rendering"
 
 	"github.com/spf13/cobra"
 )
@@ -52,6 +53,9 @@ File extensions determine the languages. Currently supported are:
 * Groovy (*.groovy)
 * Java (*.java)
 * PHP (*.php)
+* JavaScript (*.js, *.jsx)
+* TypeScript (*.tx, *.tsx)
+* Kotlin (*.kt)
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		sourcePath := "."

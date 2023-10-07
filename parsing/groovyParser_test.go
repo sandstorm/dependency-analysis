@@ -9,7 +9,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    []string
+		expected    fullyQualifiedType
 	}{
 		{
 			name: "simple class without imports",
@@ -18,7 +18,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 			public class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		{
 			name: "simple class without imports with default visibility",
@@ -27,7 +27,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 			class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		{
 			name: "simple class no semicolons",
@@ -36,7 +36,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 			class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		{
 			name: "simple class with imports",
@@ -47,7 +47,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 			public class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		// TODO: test private static final class
 	}
@@ -55,7 +55,7 @@ func TestParseGroovySourceUnit(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[]fullyQualifiedType{testCase.expected},
 				ParseGroovySourceUnit(file),
 			)
 		})
@@ -66,7 +66,7 @@ func TestParseGroovyImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple class with mixed imports",
@@ -82,11 +82,11 @@ func TestParseGroovyImports(t *testing.T) {
 
 				}
 			`,
-			expected: [][]string{
-				[]string{"java", "util", "List"},
-				[]string{"de", "sandstorm", "greetings", "HelloWorld"},
-				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
-				[]string{"org", "junit", "Assert", "assertEquals"},
+			expected: []fullyQualifiedType{
+				{"java", "util", "List"},
+				{"de", "sandstorm", "greetings", "HelloWorld"},
+				{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
+				{"org", "junit", "Assert", "assertEquals"},
 			},
 		},
 		{
@@ -103,11 +103,11 @@ func TestParseGroovyImports(t *testing.T) {
 
 				}
 			`,
-			expected: [][]string{
-				[]string{"java", "util", "List"},
-				[]string{"de", "sandstorm", "greetings", "HelloWorld"},
-				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
-				[]string{"org", "junit", "Assert", "assertEquals"},
+			expected: []fullyQualifiedType{
+				{"java", "util", "List"},
+				{"de", "sandstorm", "greetings", "HelloWorld"},
+				{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
+				{"org", "junit", "Assert", "assertEquals"},
 			},
 		},
 		// TODO: test with different parameters

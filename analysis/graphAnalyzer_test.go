@@ -1,9 +1,10 @@
 package analysis
 
 import (
-	"github.com/sandstorm/dependency-analysis/dataStructures"
 	"reflect"
 	"testing"
+
+	"github.com/sandstorm/dependency-analysis/dataStructures"
 )
 
 func AssertEquals(t *testing.T, message string, expected interface{}, actual interface{}) {
@@ -13,6 +14,14 @@ func AssertEquals(t *testing.T, message string, expected interface{}, actual int
 	t.Errorf("%s\nexpected %v (type %v), received %v (type %v)",
 		message,
 		expected, reflect.TypeOf(expected),
+		actual, reflect.TypeOf(actual))
+}
+
+func AssertNil(t *testing.T, actual interface{}) {
+	if actual == nil {
+		return
+	}
+	t.Errorf("expected nil, received %v (type %v)",
 		actual, reflect.TypeOf(actual))
 }
 

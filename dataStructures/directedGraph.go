@@ -1,5 +1,10 @@
 package dataStructures
 
+import (
+	"fmt"
+	"sort"
+)
+
 // directed graph with nodes of type string
 type DirectedStringGraph struct {
 	// all nodes with their set of children (might be empty)
@@ -49,4 +54,17 @@ func (this *DirectedStringGraph) GetEdges() map[string][]string {
 		result[caller] = callees.ToArray()
 	}
 	return result
+}
+
+func (this *DirectedStringGraph) String() string {
+	result := "{ "
+	sources := make([]string, 0, len(this.Edges))
+	for source := range this.Edges {
+		sources = append(sources, source)
+	}
+	sort.Strings(sources)
+	for _, source := range sources {
+		result += fmt.Sprintf("%v -> %v ", source, this.Edges[source])
+	}
+	return result + "}"
 }

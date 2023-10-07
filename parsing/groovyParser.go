@@ -17,21 +17,21 @@ var groovyParser = struct {
 	importRegex:  regexp.MustCompile(`import\s+(?:static\s+)?([^; \n]+)\s*;?`),
 }
 
-func ParseGroovySourceUnit(fileReader io.Reader) []string {
+func ParseGroovySourceUnit(fileReader io.Reader) []fullyQualifiedType {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	packageString := getFirstLineMatchInScanner(scanner, groovyParser.packageRegex)
 	className := getFirstLineMatchInScanner(scanner, groovyParser.classRegex)
 	if packageString != "" && className != "" {
-		return append(strings.Split(packageString, "."), className)
+		return []fullyQualifiedType{append(strings.Split(packageString, "."), className)}
 	}
 	if className != "" {
-		return []string{className}
+		return []fullyQualifiedType{{className}}
 	}
-	return []string{}
+	return []fullyQualifiedType{}
 }
 
-func ParseGroovyImports(fileReader io.Reader) ([][]string, error) {
+func ParseGroovyImports(fileReader io.Reader) ([]fullyQualifiedType, error) {
 	content, err := readerToString(fileReader)
 	if err != nil {
 		return nil, err

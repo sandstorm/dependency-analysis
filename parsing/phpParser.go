@@ -17,21 +17,21 @@ var phpParser = struct {
 	useRegex:       regexp.MustCompile(`use\s+([^; ]+)\s*;`),
 }
 
-func ParsePhpSourceUnit(fileReader io.Reader) []string {
+func ParsePhpSourceUnit(fileReader io.Reader) []fullyQualifiedType {
 	scanner := bufio.NewScanner(fileReader)
 	scanner.Split(bufio.ScanLines)
 	namespace := getFirstLineMatchInScanner(scanner, phpParser.namespaceRegex)
 	className := getFirstLineMatchInScanner(scanner, phpParser.classRegex)
 	if namespace != "" && className != "" {
-		return append(strings.Split(namespace, "\\"), className)
+		return []fullyQualifiedType{append(strings.Split(namespace, "\\"), className)}
 	}
 	if className != "" {
-		return []string{className}
+		return []fullyQualifiedType{{className}}
 	}
-	return []string{}
+	return []fullyQualifiedType{}
 }
 
-func ParsePhpImports(fileReader io.Reader) ([][]string, error) {
+func ParsePhpImports(fileReader io.Reader) ([]fullyQualifiedType, error) {
 	content, err := readerToString(fileReader)
 	if err != nil {
 		return nil, err

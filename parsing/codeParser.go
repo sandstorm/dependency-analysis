@@ -24,7 +24,7 @@ func InitializeParsers(filePath string) error {
 // The package path is already split by the language's delimiter,
 // e.g. in Java de.sandstorm.test.helpers.ListHelpers results in
 // [de sandstorm test helpers ListHelpers]
-func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
+func ParseSourceUnit(sourcePath string, fileReader io.Reader) []fullyQualifiedType {
 	switch {
 	case strings.HasSuffix(sourcePath, ".go"):
 		filePathSplit := strings.Split(sourcePath, "/")
@@ -46,8 +46,10 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 		fallthrough
 	case strings.HasSuffix(sourcePath, ".jsx"):
 		return ParseJavaScriptSourceUnit(sourcePath)
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return ParseKotlinSourceUnit(fileReader)
 	}
-	return []string{}
+	return []fullyQualifiedType{}
 }
 
 // 3rd step during code analysis, called for each source unit (see 2nc step)
@@ -56,7 +58,7 @@ func ParseSourceUnit(sourcePath string, fileReader io.Reader) []string {
 // Eg a Java source unit could provide
 // - [java util List]
 // - [de sandstorm test helpers ListHelpers]
-func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
+func ParseImports(sourcePath string, fileReader io.Reader) ([]fullyQualifiedType, error) {
 	switch {
 	case strings.HasSuffix(sourcePath, ".go"):
 		return ParseGoImports(fileReader)
@@ -74,13 +76,15 @@ func ParseImports(sourcePath string, fileReader io.Reader) ([][]string, error) {
 		fallthrough
 	case strings.HasSuffix(sourcePath, ".jsx"):
 		return ParseJavaScriptImports(sourcePath, fileReader)
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return ParseKotlinImports(fileReader)
 	}
-	return [][]string{}, nil
+	return []fullyQualifiedType{}, nil
 }
 
 // Utility function for creating nice labels
 // Joins the full package path with the according delimiter of the language.
-func JoinPathSegments(sourcePath string, segments []string) string {
+func JoinPathSegments(sourcePath string, segments fullyQualifiedType) string {
 	switch {
 	case strings.HasSuffix(sourcePath, ".go"):
 		return strings.Join(segments, "/")
@@ -100,6 +104,8 @@ func JoinPathSegments(sourcePath string, segments []string) string {
 		} else {
 			return strings.Join(segments, "/")
 		}
+	case strings.HasSuffix(sourcePath, ".kt"):
+		return strings.Join(segments, ".")
 	default:
 		return strings.Join(segments, ".")
 	}

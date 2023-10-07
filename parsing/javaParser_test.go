@@ -9,7 +9,7 @@ func TestParseJavaSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    []string
+		expected    fullyQualifiedType
 	}{
 		{
 			name: "simple class without imports",
@@ -18,7 +18,7 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			public class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		{
 			name: "simple class without imports with default visibility",
@@ -27,7 +27,7 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		{
 			name: "simple class with imports",
@@ -38,15 +38,16 @@ func TestParseJavaSourceUnit(t *testing.T) {
 			public class Main {
 
 			}`,
-			expected: []string{"de", "sandstorm", "test", "Main"},
+			expected: fullyQualifiedType{"de", "sandstorm", "test", "Main"},
 		},
 		// TODO: test private static final class
+		// TODO: interfaces and enums (also other languages)
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[]fullyQualifiedType{testCase.expected},
 				ParseJavaSourceUnit(file),
 			)
 		})
@@ -57,7 +58,7 @@ func TestParseJavaImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple class with mixed imports",
@@ -73,11 +74,11 @@ func TestParseJavaImports(t *testing.T) {
 
 				}
 			`,
-			expected: [][]string{
-				[]string{"java", "util", "List"},
-				[]string{"de", "sandstorm", "greetings", "HelloWorld"},
-				[]string{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
-				[]string{"org", "junit", "Assert", "assertEquals"},
+			expected: []fullyQualifiedType{
+				{"java", "util", "List"},
+				{"de", "sandstorm", "greetings", "HelloWorld"},
+				{"de", "sandstorm", "http", "requests", "GetGreetingRequest"},
+				{"org", "junit", "Assert", "assertEquals"},
 			},
 		},
 		// TODO: test with different parameters

@@ -9,7 +9,7 @@ func TestParsePhpSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    []string
+		expected    fullyQualifiedType
 	}{
 		{
 			name: "simple class without imports",
@@ -21,7 +21,7 @@ func TestParsePhpSourceUnit(t *testing.T) {
 			{
 
 			}`,
-			expected: []string{"App", "Controller", "MyController"},
+			expected: fullyQualifiedType{"App", "Controller", "MyController"},
 		},
 		{
 			name: "simple class with imports",
@@ -40,14 +40,14 @@ func TestParsePhpSourceUnit(t *testing.T) {
 			{
 
 			}`,
-			expected: []string{"App", "Controller", "MyController"},
+			expected: fullyQualifiedType{"App", "Controller", "MyController"},
 		},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			file := bytes.NewBufferString(testCase.fileContent)
 			AssertEquals(t,
-				testCase.expected,
+				[]fullyQualifiedType{testCase.expected},
 				ParsePhpSourceUnit(file),
 			)
 		})
@@ -58,7 +58,7 @@ func TestParsePhpImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "simple class without imports",
@@ -70,7 +70,7 @@ func TestParsePhpImports(t *testing.T) {
 			{
 
 			}`,
-			expected: [][]string{},
+			expected: []fullyQualifiedType{},
 		},
 		{
 			name: "simple class with imports",
@@ -87,12 +87,12 @@ func TestParsePhpImports(t *testing.T) {
 			{
 
 			}`,
-			expected: [][]string{
-				[]string{"App", "ArrayUtils"},
-				[]string{"App", "Entity", "MyEntity"},
-				[]string{"Symfony", "Component", "HttpFoundation", "Request"},
-				[]string{"Symfony", "Component", "HttpFoundation", "Response"},
-				[]string{"Symfony", "Component", "Routing", "Annotation", "Route"},
+			expected: []fullyQualifiedType{
+				{"App", "ArrayUtils"},
+				{"App", "Entity", "MyEntity"},
+				{"Symfony", "Component", "HttpFoundation", "Request"},
+				{"Symfony", "Component", "HttpFoundation", "Response"},
+				{"Symfony", "Component", "Routing", "Annotation", "Route"},
 			},
 		},
 	}

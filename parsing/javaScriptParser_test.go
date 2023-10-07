@@ -9,27 +9,27 @@ func TestParseJavaScriptSourceUnit(t *testing.T) {
 	testCases := []struct {
 		name       string
 		sourcePath string
-		expected   []string
+		expected   []fullyQualifiedType
 	}{
 		{
 			name:       "file path without dots",
 			sourcePath: "src/Components/Button/button.js",
-			expected:   []string{"src", "Components", "Button", "button"},
+			expected:   []fullyQualifiedType{{"src", "Components", "Button", "button"}},
 		},
 		{
 			name:       "file path with dots",
 			sourcePath: "a/.././src/a/../b/c/../.././Components/Button/button.js",
-			expected:   []string{"src", "Components", "Button", "button"},
+			expected:   []fullyQualifiedType{{"src", "Components", "Button", "button"}},
 		},
 		{
 			name:       "file path with index.js",
 			sourcePath: "a/.././src/a/../b/c/../.././Components/Button/index.js",
-			expected:   []string{"src", "Components", "Button"},
+			expected:   []fullyQualifiedType{{"src", "Components", "Button"}},
 		},
 		{
 			name:       "ignore node_modules",
 			sourcePath: "node_modules/some/lib.js",
-			expected:   []string{},
+			expected:   []fullyQualifiedType{},
 		},
 	}
 	for _, testCase := range testCases {
@@ -47,14 +47,14 @@ func TestParseJavaScriptImports(t *testing.T) {
 	testCases := []struct {
 		name        string
 		fileContent string
-		expected    [][]string
+		expected    []fullyQualifiedType
 	}{
 		{
 			name: "no imports",
 			fileContent: `package dataStructures
 
 			function myCoolFunction() {}`,
-			expected: [][]string{},
+			expected: []fullyQualifiedType{},
 		},
 		{
 			name: "library imports",
@@ -63,8 +63,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import React from 'react';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"react"},
+			expected: []fullyQualifiedType{
+				{"react"},
 			},
 		},
 		{
@@ -74,8 +74,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import User from './Model/user';
 
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model", "user"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model", "user"},
 			},
 		},
 		{
@@ -86,9 +86,9 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import User from './Model/user';
 
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"react"},
-				[]string{"my", "projects", "src", "root", "path", "Model", "user"},
+			expected: []fullyQualifiedType{
+				{"react"},
+				{"my", "projects", "src", "root", "path", "Model", "user"},
 			},
 		},
 		{
@@ -98,8 +98,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import Model from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -109,8 +109,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import * from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -120,8 +120,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import User from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -131,8 +131,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import { User } from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -142,8 +142,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import Model, { User } from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -153,8 +153,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import { User as Nutzer } from './Model';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "root", "path", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "root", "path", "Model"},
 			},
 		},
 		{
@@ -164,8 +164,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			from "react";
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"react"},
+			expected: []fullyQualifiedType{
+				{"react"},
 			},
 		},
 		{
@@ -175,8 +175,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			from "react"
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"react"},
+			expected: []fullyQualifiedType{
+				{"react"},
 			},
 		},
 		{
@@ -186,8 +186,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			from 'react';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"react"},
+			expected: []fullyQualifiedType{
+				{"react"},
 			},
 		},
 		{
@@ -197,8 +197,8 @@ func TestParseJavaScriptImports(t *testing.T) {
 			import User from '../../Model/x/./a/./../..';
 			
 			function myCoolFunction() {}`,
-			expected: [][]string{
-				[]string{"my", "projects", "src", "Model"},
+			expected: []fullyQualifiedType{
+				{"my", "projects", "src", "Model"},
 			},
 		},
 	}

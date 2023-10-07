@@ -1,38 +1,43 @@
 package analysis
 
 import (
-	"github.com/sandstorm/dependency-analysis/dataStructures"
-	"github.com/sandstorm/dependency-analysis/parsing"
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/sandstorm/dependency-analysis/dataStructures"
+	"github.com/sandstorm/dependency-analysis/parsing"
 )
 
+type fullyQualifiedType = []string
+
 // mapping from file path to source-unit
-type sourceUnitByFile = map[string][]string
+type sourceUnitsByFileType = map[string][]fullyQualifiedType
 
 // mapping from source-unit to all its imports
 type dependenciesBySourceUnit = map[string]*dataStructures.StringSet
 
 func BuildDependencyGraph(settings *AnalyzerSettings) (*dataStructures.DirectedStringGraph, error) {
-	sourceUnits := make(sourceUnitByFile)
+	sourceUnitsByFile := make(sourceUnitsByFileType)
 	if err := filepath.Walk(settings.SourcePath, initializeParsers(settings.IncludePattern)); err != nil {
 		return nil, err
 	}
-	if err := filepath.Walk(settings.SourcePath, findSourceUnits(settings.IncludePattern, sourceUnits)); err != nil {
+	if err := filepath.Walk(settings.SourcePath, findSourceUnits(settings.IncludePattern, sourceUnitsByFile)); err != nil {
 		return nil, err
 	}
-	var rootPackage []string = nil
-	for _, sourceUnit := range sourceUnits {
-		if rootPackage == nil {
-			rootPackage = sourceUnit
-		} else {
-			commonPrefixLength := getCommonPrefixLength(rootPackage, sourceUnit)
-			rootPackage = rootPackage[:commonPrefixLength]
+	var rootPackage fullyQualifiedType = nil
+	for _, sourceUnits := range sourceUnitsByFile {
+		for _, sourceUnit := range sourceUnits {
+			if rootPackage == nil {
+				rootPackage = sourceUnit
+			} else {
+				commonPrefixLength := getCommonPrefixLength(rootPackage, sourceUnit)
+				rootPackage = rootPackage[:commonPrefixLength]
+			}
 		}
 	}
 
-	return findDependencies(rootPackage, sourceUnits, settings.Depth)
+	return findDependencies(rootPackage, sourceUnitsByFile, settings.Depth)
 }
 
 func initializeParsers(includePattern *regexp.Regexp) filepath.WalkFunc {
@@ -47,7 +52,7 @@ func initializeParsers(includePattern *regexp.Regexp) filepath.WalkFunc {
 	}
 }
 
-func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitByFile) filepath.WalkFunc {
+func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitsByFileType) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -58,16 +63,16 @@ func findSourceUnits(includePattern *regexp.Regexp, result sourceUnitByFile) fil
 				return err
 			}
 			defer fileReader.Close()
-			sourceUnit := parsing.ParseSourceUnit(path, fileReader)
-			if len(sourceUnit) > 0 {
-				result[path] = sourceUnit
+			sourceUnits := parsing.ParseSourceUnit(path, fileReader)
+			if len(sourceUnits) > 0 {
+				result[path] = sourceUnits
 			}
 		}
 		return nil
 	}
 }
 
-func getCommonPrefixLength(left []string, right []string) int {
+func getCommonPrefixLength(left fullyQualifiedType, right fullyQualifiedType) int {
 	limit := min(len(left), len(right))
 	for i := 0; i < limit; i++ {
 		if left[i] != right[i] {
@@ -77,11 +82,11 @@ func getCommonPrefixLength(left []string, right []string) int {
 	return limit
 }
 
-func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile, depth int) (*dataStructures.DirectedStringGraph, error) {
+func findDependencies(rootPackage fullyQualifiedType, sourceUnitsByFile sourceUnitsByFileType, depth int) (*dataStructures.DirectedStringGraph, error) {
 	dependencyGraph := dataStructures.NewDirectedStringGraph()
 	prefixLength := len(rootPackage)
 	segmentLimit := len(rootPackage) + depth
-	for path, sourceUnit := range sourceUnits {
+	for path, sourceUnits := range sourceUnitsByFile {
 		fileReader, err := os.Open(path)
 		if err != nil {
 			return nil, err
@@ -91,17 +96,21 @@ func findDependencies(rootPackage []string, sourceUnits sourceUnitByFile, depth 
 		if err != nil {
 			return nil, err
 		}
-		sourceUnitString := parsing.JoinPathSegments(
-			path,
-			sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
-		dependencyGraph.AddNode(sourceUnitString)
-		for _, dependency := range allDependencies {
-			if arrayStartsWith(dependency, rootPackage) {
-				dependencyString := parsing.JoinPathSegments(
-					path,
-					dependency[prefixLength:min(segmentLimit, len(dependency))])
-				if sourceUnitString != dependencyString {
-					dependencyGraph.AddEdge(sourceUnitString, dependencyString)
+		for _, sourceUnit := range sourceUnits {
+			sourceUnitString := parsing.JoinPathSegments(
+				path,
+				sourceUnit[prefixLength:min(segmentLimit, len(sourceUnit))])
+			if sourceUnitString != "" {
+				dependencyGraph.AddNode(sourceUnitString)
+				for _, dependency := range allDependencies {
+					if arrayStartsWith(dependency, rootPackage) {
+						dependencyString := parsing.JoinPathSegments(
+							path,
+							dependency[prefixLength:min(segmentLimit, len(dependency))])
+						if sourceUnitString != dependencyString {
+							dependencyGraph.AddEdge(sourceUnitString, dependencyString)
+						}
+					}
 				}
 			}
 		}
